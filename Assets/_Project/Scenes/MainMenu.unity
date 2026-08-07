@@ -119,7 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
-<<<<<<<< HEAD:Assets/_Project/Scenes/MainMenu.unity
 --- !u!1 &2457009
 GameObject:
   m_ObjectHideFlags: 0
@@ -390,9 +389,3 @@ SceneRoots:
   - {fileID: 2457012}
   - {fileID: 300582468}
   - {fileID: 1269949203}
-========
---- !u!1660057539 &9223372036854775807
-SceneRoots:
-  m_ObjectHideFlags: 0
-  m_Roots: []
->>>>>>>> 4a37acf7832bbeb5e3d952472db89b1b6af52a83:Assets/Scenes/SampleScene.unity
