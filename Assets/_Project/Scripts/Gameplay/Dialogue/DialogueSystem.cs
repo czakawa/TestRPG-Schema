@@ -52,8 +52,12 @@ namespace Project.Gameplay.Dialogue
         }
 
         /// <summary>
-        /// Wybiera opcję o danym indeksie w aktualnym węźle. NextNodeIndex == -1 kończy rozmowę
-        /// (patrz EndDialogue), inaczej przechodzi do wskazanego węzła i publikuje DialogueNodeChangedEvent.
+        /// Wybiera opcję o danym indeksie w aktualnym węźle. Jeśli opcja niesie QuestAction != None,
+        /// publikuje DialogueQuestActionEvent PRZED przejściem dalej - DialogueSystem celowo nie ma
+        /// twardej referencji do QuestSystem (systemy komunikują się przez EventBus), więc samo
+        /// rozpoczęcie/oddanie questa wykonuje QuestBridge w reakcji na ten event. Następnie:
+        /// NextNodeIndex == -1 kończy rozmowę (patrz EndDialogue), inaczej przechodzi do wskazanego
+        /// węzła i publikuje DialogueNodeChangedEvent.
         /// </summary>
         public void SelectOption(int optionIndex)
         {
@@ -69,6 +73,12 @@ namespace Project.Gameplay.Dialogue
             }
 
             DialogueOption option = currentNode.Options[optionIndex];
+
+            if (option.QuestAction != QuestActionType.None)
+            {
+                EventBus.Publish(new DialogueQuestActionEvent(option.QuestAction, option.TargetQuest));
+            }
+
             if (option.NextNodeIndex == -1)
             {
                 EndDialogue();

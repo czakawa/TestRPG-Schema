@@ -4,6 +4,18 @@ using UnityEngine;
 namespace Project.Data
 {
     /// <summary>
+    /// Akcja questowa powiązana z opcją dialogową. DialogueSystem.SelectOption publikuje
+    /// DialogueQuestActionEvent z tą wartością - QuestBridge subskrybuje event i tłumaczy go
+    /// na QuestSystem.StartQuest/TryTurnInQuest.
+    /// </summary>
+    public enum QuestActionType
+    {
+        None,
+        StartQuest,
+        TurnInQuest
+    }
+
+    /// <summary>
     /// Pojedyncza opcja odpowiedzi gracza w węźle dialogowym. Zwykła serializowalna klasa
     /// (nie ScriptableObject) - zagnieżdżona w liście wewnątrz DialogueNode.
     /// </summary>
@@ -12,10 +24,18 @@ namespace Project.Data
     {
         [SerializeField] private string optionText;
         [SerializeField] private int nextNodeIndex = -1;
+        [SerializeField] private QuestActionType questAction = QuestActionType.None;
+        [SerializeField] private QuestData targetQuest;
 
         public string OptionText => optionText;
 
         /// <summary>Indeks w DialogueTree.Nodes, do którego przechodzi rozmowa. -1 = koniec rozmowy.</summary>
         public int NextNodeIndex => nextNodeIndex;
+
+        /// <summary>Akcja questowa wykonywana po wybraniu tej opcji, przed przejściem do kolejnego węzła.</summary>
+        public QuestActionType QuestAction => questAction;
+
+        /// <summary>Quest, którego dotyczy QuestAction. Ignorowane, jeśli QuestAction == None.</summary>
+        public QuestData TargetQuest => targetQuest;
     }
 }

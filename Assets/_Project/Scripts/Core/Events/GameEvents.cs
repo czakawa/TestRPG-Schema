@@ -102,4 +102,98 @@ namespace Project.Core.Events
     public readonly struct DialogueEndedEvent
     {
     }
+
+    /// <summary>
+    /// Publikowane przez <see cref="Project.Gameplay.Stats.PlayerStatsSystem"/> po każdej zmianie
+    /// Vitali (ModifyHealth/ModifyStamina/ModifyMana) lub atrybutu (SetAttribute). Pusty sygnał -
+    /// subskrybenci (CharacterPanelUI) odczytują aktualny stan przez referencję do systemu,
+    /// tak samo jak InventoryChangedEvent.
+    /// </summary>
+    public readonly struct StatsChangedEvent
+    {
+    }
+
+    /// <summary>
+    /// Publikowane przez <see cref="Project.Gameplay.Equipment.EquipmentSystem"/> po każdej udanej
+    /// zmianie założonego ekwipunku (TryEquip/TryUnequip). Pusty sygnał - subskrybenci
+    /// (CharacterPanelUI) odczytują aktualny stan przez referencję do systemu.
+    /// </summary>
+    public readonly struct EquipmentChangedEvent
+    {
+    }
+
+    /// <summary>
+    /// Publikowane przez <see cref="Project.Gameplay.Quests.QuestSystem"/>, gdy quest zostaje
+    /// rozpoczęty (StartQuest).
+    /// </summary>
+    public readonly struct QuestStartedEvent
+    {
+        public readonly QuestData Quest;
+
+        public QuestStartedEvent(QuestData quest)
+        {
+            Quest = quest;
+        }
+    }
+
+    /// <summary>
+    /// Publikowane przez <see cref="Project.Gameplay.Quests.QuestSystem"/> po każdej aktualizacji
+    /// postępu celu aktywnego questa (ReportItemCollected/ReportNpcTalkedTo).
+    /// </summary>
+    public readonly struct QuestObjectiveUpdatedEvent
+    {
+        public readonly QuestData Quest;
+
+        public QuestObjectiveUpdatedEvent(QuestData quest)
+        {
+            Quest = quest;
+        }
+    }
+
+    /// <summary>
+    /// Publikowane przez <see cref="Project.Gameplay.Quests.QuestSystem"/>, gdy wszystkie cele
+    /// questa zostają spełnione (stan Active -&gt; Completed).
+    /// </summary>
+    public readonly struct QuestCompletedEvent
+    {
+        public readonly QuestData Quest;
+
+        public QuestCompletedEvent(QuestData quest)
+        {
+            Quest = quest;
+        }
+    }
+
+    /// <summary>
+    /// Publikowane przez <see cref="Project.Gameplay.Quests.QuestSystem"/> po udanym odebraniu
+    /// nagrody (TryTurnInQuest, stan Completed -&gt; TurnedIn).
+    /// </summary>
+    public readonly struct QuestTurnedInEvent
+    {
+        public readonly QuestData Quest;
+
+        public QuestTurnedInEvent(QuestData quest)
+        {
+            Quest = quest;
+        }
+    }
+
+    /// <summary>
+    /// Publikowane przez <see cref="Project.Gameplay.Dialogue.DialogueSystem"/> w SelectOption, gdy
+    /// wybrana opcja niesie akcję questową (QuestActionType != None), PRZED przejściem do kolejnego
+    /// węzła lub zakończeniem rozmowy. DialogueSystem nie zależy bezpośrednio od QuestSystem -
+    /// QuestBridge subskrybuje ten event i tłumaczy go na StartQuest/TryTurnInQuest, zachowując
+    /// komunikację między systemami wyłącznie przez EventBus.
+    /// </summary>
+    public readonly struct DialogueQuestActionEvent
+    {
+        public readonly QuestActionType Action;
+        public readonly QuestData Quest;
+
+        public DialogueQuestActionEvent(QuestActionType action, QuestData quest)
+        {
+            Action = action;
+            Quest = quest;
+        }
+    }
 }

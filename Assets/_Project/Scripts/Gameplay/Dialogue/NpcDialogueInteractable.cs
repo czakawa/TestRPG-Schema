@@ -3,6 +3,7 @@ using Project.Core.Events;
 using Project.Core.States;
 using Project.Data;
 using Project.Gameplay.Interaction;
+using Project.Gameplay.Quests;
 using UnityEngine;
 
 namespace Project.Gameplay.Dialogue
@@ -43,6 +44,12 @@ namespace Project.Gameplay.Dialogue
 
             GameManager.Instance.ChangeState(GameStateType.Dialogue);
             dialogueBridge.Dialogue.StartDialogue(dialogueTree);
+
+            QuestBridge questBridge = interactor.GetComponentInParent<QuestBridge>();
+            if (questBridge != null)
+            {
+                questBridge.Quest.ReportNpcTalkedTo(dialogueTree.DialogueId);
+            }
         }
 
         public string GetInteractionPrompt()

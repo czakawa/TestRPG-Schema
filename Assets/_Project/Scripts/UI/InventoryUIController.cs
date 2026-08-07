@@ -3,6 +3,7 @@ using Project.Core;
 using Project.Core.Events;
 using Project.Core.States;
 using Project.Data;
+using Project.Gameplay.Equipment;
 using Project.Gameplay.Inventory;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -25,6 +26,7 @@ namespace Project.UI
         private const string InventoryLockReason = "Inventory";
 
         [SerializeField] private InventoryBridge inventoryBridge;
+        [SerializeField] private EquipmentBridge equipmentBridge;
         [SerializeField] private GameObject inventoryPanelRoot;
         [SerializeField] private Transform slotsContainer;
         [SerializeField] private GameObject slotPrefab;
@@ -48,6 +50,7 @@ namespace Project.UI
             toggleInventoryAction.action.performed += OnTogglePerformed;
 
             categoryTabs.OnCategorySelected += OnCategorySelected;
+            descriptionPanel.OnEquipClicked += OnEquipClicked;
         }
 
         private void OnDisable()
@@ -59,6 +62,7 @@ namespace Project.UI
             toggleInventoryAction.action.Disable();
 
             categoryTabs.OnCategorySelected -= OnCategorySelected;
+            descriptionPanel.OnEquipClicked -= OnEquipClicked;
 
             if (inventoryPanelRoot.activeSelf)
             {
@@ -129,6 +133,14 @@ namespace Project.UI
                 descriptionPanel.Show(item);
             }
             else
+            {
+                descriptionPanel.Hide();
+            }
+        }
+
+        private void OnEquipClicked(ItemData item)
+        {
+            if (equipmentBridge.Equipment.TryEquip(item))
             {
                 descriptionPanel.Hide();
             }

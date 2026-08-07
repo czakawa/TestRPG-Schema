@@ -136,6 +136,24 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ToggleCharacterPanel"",
+                    ""type"": ""Button"",
+                    ""id"": ""a4d9e2c7-5b1f-4a6d-9e3c-7f0b2d5a8c1e"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ToggleQuestLog"",
+                    ""type"": ""Button"",
+                    ""id"": ""c8a1f5e6-2d4b-4c9a-b7e3-5f8d1a6c9e2b"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -292,6 +310,28 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""ToggleInventory"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d6e9f3a1-8c4b-4d7e-a2f5-9b1c6e0d4a8f"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleCharacterPanel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e7f2a4b8-9c3d-4e1f-8a6b-2d5c7e9f1a4b"",
+                    ""path"": ""<Keyboard>/j"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleQuestLog"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -305,6 +345,8 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
         m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
         m_Player_ToggleInventory = m_Player.FindAction("ToggleInventory", throwIfNotFound: true);
+        m_Player_ToggleCharacterPanel = m_Player.FindAction("ToggleCharacterPanel", throwIfNotFound: true);
+        m_Player_ToggleQuestLog = m_Player.FindAction("ToggleQuestLog", throwIfNotFound: true);
     }
 
     ~@PlayerControls()
@@ -390,6 +432,8 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Look;
     private readonly InputAction m_Player_Interact;
     private readonly InputAction m_Player_ToggleInventory;
+    private readonly InputAction m_Player_ToggleCharacterPanel;
+    private readonly InputAction m_Player_ToggleQuestLog;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -421,6 +465,14 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/ToggleInventory".
         /// </summary>
         public InputAction @ToggleInventory => m_Wrapper.m_Player_ToggleInventory;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/ToggleCharacterPanel".
+        /// </summary>
+        public InputAction @ToggleCharacterPanel => m_Wrapper.m_Player_ToggleCharacterPanel;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/ToggleQuestLog".
+        /// </summary>
+        public InputAction @ToggleQuestLog => m_Wrapper.m_Player_ToggleQuestLog;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -462,6 +514,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @ToggleInventory.started += instance.OnToggleInventory;
             @ToggleInventory.performed += instance.OnToggleInventory;
             @ToggleInventory.canceled += instance.OnToggleInventory;
+            @ToggleCharacterPanel.started += instance.OnToggleCharacterPanel;
+            @ToggleCharacterPanel.performed += instance.OnToggleCharacterPanel;
+            @ToggleCharacterPanel.canceled += instance.OnToggleCharacterPanel;
+            @ToggleQuestLog.started += instance.OnToggleQuestLog;
+            @ToggleQuestLog.performed += instance.OnToggleQuestLog;
+            @ToggleQuestLog.canceled += instance.OnToggleQuestLog;
         }
 
         /// <summary>
@@ -488,6 +546,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @ToggleInventory.started -= instance.OnToggleInventory;
             @ToggleInventory.performed -= instance.OnToggleInventory;
             @ToggleInventory.canceled -= instance.OnToggleInventory;
+            @ToggleCharacterPanel.started -= instance.OnToggleCharacterPanel;
+            @ToggleCharacterPanel.performed -= instance.OnToggleCharacterPanel;
+            @ToggleCharacterPanel.canceled -= instance.OnToggleCharacterPanel;
+            @ToggleQuestLog.started -= instance.OnToggleQuestLog;
+            @ToggleQuestLog.performed -= instance.OnToggleQuestLog;
+            @ToggleQuestLog.canceled -= instance.OnToggleQuestLog;
         }
 
         /// <summary>
@@ -563,5 +627,19 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnToggleInventory(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ToggleCharacterPanel" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnToggleCharacterPanel(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ToggleQuestLog" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnToggleQuestLog(InputAction.CallbackContext context);
     }
 }
