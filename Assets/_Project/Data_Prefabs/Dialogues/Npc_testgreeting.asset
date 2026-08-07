@@ -20,7 +20,7 @@ MonoBehaviour:
     - optionText: Szukam pracy.
       nextNodeIndex: 1
       questAction: 1
-      targetQuest: {fileID: 11400000, guid: 2a3f81a44eb668f4986ea5a2a11a54e9, type: 2}
+      targetQuest: {fileID: 11400000, guid: 408b1c22d2e2e9d4ba7156caa3477ad0, type: 2}
     - optionText: "Nic, tylko przechodz\u0119."
       nextNodeIndex: -1
       questAction: 0
@@ -38,5 +38,5 @@ MonoBehaviour:
     - optionText: Nic Rozumiem.
       nextNodeIndex: -1
       questAction: 2
-      targetQuest: {fileID: 11400000, guid: 2a3f81a44eb668f4986ea5a2a11a54e9, type: 2}
+      targetQuest: {fileID: 11400000, guid: 408b1c22d2e2e9d4ba7156caa3477ad0, type: 2}
   startNodeIndex: 0

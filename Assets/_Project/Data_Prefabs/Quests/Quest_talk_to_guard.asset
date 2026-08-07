@@ -21,6 +21,6 @@ MonoBehaviour:
     requiredAmount: 1
     description: Porozmawiaj z Straznikiem
   reward:
-    goldAmount: 5
+    goldAmount: 6
     rewardItem: {fileID: 0}
     rewardItemQuantity: 1
