@@ -15,16 +15,13 @@ namespace Project.Gameplay.Camera
     {
         [SerializeField] private Transform cameraAnchor;
         [SerializeField] private Transform cameraTransform;
+        [SerializeField] private Transform playerTransform;
         [SerializeField] private InputActionReference lookAction;
 
         [Header("Tuning")]
         [SerializeField] private float sensitivity = 0.1f;
         [SerializeField] private float pitchMin = -20f;
         [SerializeField] private float pitchMax = 60f;
-        [SerializeField] private float yawMin = -110f;
-        [SerializeField] private float yawMax = 110f;
-        [SerializeField] private float recenterDelay = 1.5f;
-        [SerializeField] private float recenterSpeed = 3f;
 
         private CameraOrbitSystem _orbitSystem;
 
@@ -34,11 +31,15 @@ namespace Project.Gameplay.Camera
 
         private void Awake()
         {
-            _orbitSystem = new CameraOrbitSystem(sensitivity, pitchMin, pitchMax, yawMin, yawMax, recenterDelay, recenterSpeed);
+            _orbitSystem = new CameraOrbitSystem(sensitivity, pitchMin, pitchMax);
+            _orbitSystem.SetInitialYaw(playerTransform.eulerAngles.y);
         }
 
         private void OnEnable()
         {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+
             lookAction.action.Enable();
 
             if (GameManager.Instance == null)
@@ -52,6 +53,9 @@ namespace Project.Gameplay.Camera
 
         private void OnDisable()
         {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+
             lookAction.action.Disable();
 
             if (GameManager.Instance != null)
@@ -68,6 +72,18 @@ namespace Project.Gameplay.Camera
         /// </summary>
         private void Update()
         {
+            bool shouldLockCursor = !GameplayInputLock.IsCameraLocked;
+            if (shouldLockCursor && Cursor.lockState != CursorLockMode.Locked)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+            else if (!shouldLockCursor && Cursor.lockState != CursorLockMode.None)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
+
             if (GameplayInputLock.IsCameraLocked)
             {
                 return;
@@ -79,11 +95,12 @@ namespace Project.Gameplay.Camera
             }
 
             _orbitSystem.AddLookInput(lookAction.action.ReadValue<Vector2>());
+            playerTransform.rotation = Quaternion.Euler(0f, _orbitSystem.Yaw, 0f);
         }
 
         private void LateUpdate()
         {
-            cameraAnchor.localRotation = _orbitSystem.CurrentRotation;
+            cameraAnchor.localRotation = Quaternion.Euler(_orbitSystem.Pitch, 0f, 0f);
             cameraTransform.SetPositionAndRotation(cameraAnchor.position, cameraAnchor.rotation);
         }
     }

@@ -1559,11 +1559,11 @@ RectTransform:
   - {fileID: 243053735}
   m_Father: {fileID: 1220246951}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: -40}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: 0, y: 40}
   m_SizeDelta: {x: 200, y: 40}
-  m_Pivot: {x: 0, y: 1}
+  m_Pivot: {x: 1, y: 0}
 --- !u!114 &544921086
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2554,14 +2554,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Project.Gameplay.Camera.CameraOrbitBridge
   cameraAnchor: {fileID: 1864087097}
   cameraTransform: {fileID: 822011553}
+  playerTransform: {fileID: 763422266}
   lookAction: {fileID: 5306396801432469906, guid: 1bb93eb3a9b50b547a29965df6b3686c, type: 3}
   sensitivity: 0.1
   pitchMin: -20
   pitchMax: 60
-  yawMin: -110
-  yawMax: 110
-  recenterDelay: 1.5
-  recenterSpeed: 3
 --- !u!114 &763422269
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5635,11 +5632,11 @@ RectTransform:
   - {fileID: 895971907}
   m_Father: {fileID: 1220246951}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 200, y: 40}
-  m_Pivot: {x: 0, y: 1}
+  m_Pivot: {x: 1, y: 0}
 --- !u!114 &1248848899
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8668,11 +8665,11 @@ RectTransform:
   - {fileID: 1322743763}
   m_Father: {fileID: 1220246951}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: -80}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: 0, y: 80}
   m_SizeDelta: {x: 200, y: 40}
-  m_Pivot: {x: 0, y: 1}
+  m_Pivot: {x: 1, y: 0}
 --- !u!114 &2069902849
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -16,27 +16,27 @@ namespace Project.Gameplay.Camera
         private readonly float _sensitivity;
         private readonly float _pitchMin;
         private readonly float _pitchMax;
-        private readonly float _yawMin;
-        private readonly float _yawMax;
-        private readonly float _recenterDelay;
-        private readonly float _recenterSpeed;
 
         private float _yaw;
         private float _pitch;
-        private float _timeSinceLastInput;
-        private bool _inputReceivedThisFrame;
 
         public Quaternion CurrentRotation => Quaternion.Euler(_pitch, _yaw, 0f);
 
-        public CameraOrbitSystem(float sensitivity, float pitchMin, float pitchMax, float yawMin, float yawMax, float recenterDelay, float recenterSpeed)
+        public float Yaw => _yaw;
+        public float Pitch => _pitch;
+
+        public CameraOrbitSystem(float sensitivity, float pitchMin, float pitchMax)
         {
             _sensitivity = sensitivity;
             _pitchMin = pitchMin;
             _pitchMax = pitchMax;
-            _yawMin = yawMin;
-            _yawMax = yawMax;
-            _recenterDelay = recenterDelay;
-            _recenterSpeed = recenterSpeed;
+        }
+
+        /// <summary>Ustawia startowy yaw, żeby uniknąć "skoku" postaci przy starcie sceny, gdy jej
+        /// rotacja startowa != 0.</summary>
+        public void SetInitialYaw(float yaw)
+        {
+            _yaw = yaw;
         }
 
         /// <summary>Wywoływane przez bridge co klatkę z aktualną wartością akcji Look.</summary>
@@ -47,35 +47,18 @@ namespace Project.Gameplay.Camera
                 return;
             }
 
-            _yaw = Mathf.Clamp(_yaw + delta.x * _sensitivity, _yawMin, _yawMax);
+            _yaw = Mathf.Repeat(_yaw + delta.x * _sensitivity, 360f);
             _pitch = Mathf.Clamp(_pitch - delta.y * _sensitivity, _pitchMin, _pitchMax);
-            _timeSinceLastInput = 0f;
-            _inputReceivedThisFrame = true;
         }
 
         public void Initialize()
         {
             _yaw = 0f;
             _pitch = 0f;
-            _timeSinceLastInput = 0f;
-            _inputReceivedThisFrame = false;
         }
 
         public void Tick(float deltaTime)
         {
-            if (!_inputReceivedThisFrame)
-            {
-                _timeSinceLastInput += deltaTime;
-            }
-
-            _inputReceivedThisFrame = false;
-
-            if (_timeSinceLastInput > _recenterDelay)
-            {
-                float t = _recenterSpeed * deltaTime;
-                _yaw = Mathf.LerpAngle(_yaw, 0f, t);
-                _pitch = Mathf.Lerp(_pitch, 0f, t);
-            }
         }
 
         public void FixedTick(float fixedDeltaTime)
