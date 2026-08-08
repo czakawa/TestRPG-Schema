@@ -13,14 +13,14 @@ MonoBehaviour:
   m_Name: Quest_talk_to_guard
   m_EditorClassIdentifier: Assembly-CSharp::Project.Data.QuestData
   questId: talk_to_guard
-  title: Porozmawiaj z Straznikiem
-  description: "Przedstaw sie miejscowej w\u0142adzy"
+  title: Porozmawiaj z cwelem
+  description: Porozmawiaj z cwelem
   objectives:
   - type: 1
-    targetId: npc_test_greeting
+    targetId: dialog_chuj
     requiredAmount: 1
-    description: Porozmawiaj z Straznikiem
+    description: Porozmawiaj z cwelem
   reward:
     goldAmount: 6
-    rewardItem: {fileID: 0}
+    rewardItem: {fileID: 11400000, guid: 2469eacfa8028194d831cedd389eed2d, type: 2}
     rewardItemQuantity: 1
