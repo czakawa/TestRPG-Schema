@@ -25,6 +25,8 @@ namespace Project.Gameplay.Stats
         [SerializeField] private int startingDexterity = 10;
         [SerializeField] private int startingEndurance = 10;
         [SerializeField] private int startingWisdom = 10;
+        [SerializeField] private float staminaRegenRate = 10f;
+        [SerializeField] private float staminaRegenDelay = 2f;
         [SerializeField] private EquipmentBridge equipmentBridge;
 
         private PlayerStatsSystem _statsSystem;
@@ -41,7 +43,9 @@ namespace Project.Gameplay.Stats
                 startingStrength,
                 startingDexterity,
                 startingEndurance,
-                startingWisdom);
+                startingWisdom,
+                staminaRegenRate,
+                staminaRegenDelay);
         }
 
         private void OnEnable()

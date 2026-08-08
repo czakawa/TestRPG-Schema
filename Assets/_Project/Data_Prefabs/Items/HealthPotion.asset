@@ -19,3 +19,6 @@ MonoBehaviour:
   isStackable: 1
   maxStackSize: 10
   itemType: 5
+  damageValue: 0
+  armorValue: 0
+  basePrice: 5

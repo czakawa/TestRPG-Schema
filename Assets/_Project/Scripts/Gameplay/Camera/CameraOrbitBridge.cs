@@ -21,6 +21,8 @@ namespace Project.Gameplay.Camera
         [SerializeField] private float sensitivity = 0.1f;
         [SerializeField] private float pitchMin = -20f;
         [SerializeField] private float pitchMax = 60f;
+        [SerializeField] private float yawMin = -110f;
+        [SerializeField] private float yawMax = 110f;
         [SerializeField] private float recenterDelay = 1.5f;
         [SerializeField] private float recenterSpeed = 3f;
 
@@ -32,7 +34,7 @@ namespace Project.Gameplay.Camera
 
         private void Awake()
         {
-            _orbitSystem = new CameraOrbitSystem(sensitivity, pitchMin, pitchMax, recenterDelay, recenterSpeed);
+            _orbitSystem = new CameraOrbitSystem(sensitivity, pitchMin, pitchMax, yawMin, yawMax, recenterDelay, recenterSpeed);
         }
 
         private void OnEnable()

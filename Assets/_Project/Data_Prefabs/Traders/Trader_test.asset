@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 787511a257f923d47b7419f22c54f170, type: 3}
+  m_Name: Trader_test
+  m_EditorClassIdentifier: Assembly-CSharp::Project.Data.TraderData
+  stock:
+  - item: {fileID: 11400000, guid: 2469eacfa8028194d831cedd389eed2d, type: 2}
+    price: 50
+    startingQuantity: 3
+  - item: {fileID: 11400000, guid: 228e5702d846f354587f01ed71be0a8b, type: 2}
+    price: 60
+    startingQuantity: 1
+  - item: {fileID: 11400000, guid: 97e2991b6816d8f40b3b2dfd29c1b9b0, type: 2}
+    price: 10
+    startingQuantity: 10
+  sellMultiplier: 0.5

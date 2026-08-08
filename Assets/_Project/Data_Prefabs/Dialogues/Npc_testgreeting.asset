@@ -21,10 +21,17 @@ MonoBehaviour:
       nextNodeIndex: 1
       questAction: 1
       targetQuest: {fileID: 11400000, guid: 408b1c22d2e2e9d4ba7156caa3477ad0, type: 2}
+      opensTrade: 0
     - optionText: "Nic, tylko przechodz\u0119."
       nextNodeIndex: -1
       questAction: 0
       targetQuest: {fileID: 0}
+      opensTrade: 0
+    - optionText: Pokaz Swoje Towary
+      nextNodeIndex: -1
+      questAction: 0
+      targetQuest: {fileID: 0}
+      opensTrade: 1
   - npcText: "Mam robot\u0119 dla kogo\u015B takiego jak ty."
     speakerName: "Stra\u017Cnik"
     options:
@@ -32,6 +39,7 @@ MonoBehaviour:
       nextNodeIndex: 2
       questAction: 0
       targetQuest: {fileID: 0}
+      opensTrade: 0
   - npcText: "Wr\xF3\u0107, gdy b\u0119dziesz got\xF3w."
     speakerName: "Stra\u017Cnik"
     options:
@@ -39,4 +47,5 @@ MonoBehaviour:
       nextNodeIndex: -1
       questAction: 2
       targetQuest: {fileID: 11400000, guid: 408b1c22d2e2e9d4ba7156caa3477ad0, type: 2}
+      opensTrade: 0
   startNodeIndex: 0

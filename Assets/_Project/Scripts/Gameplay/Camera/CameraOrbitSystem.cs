@@ -16,6 +16,8 @@ namespace Project.Gameplay.Camera
         private readonly float _sensitivity;
         private readonly float _pitchMin;
         private readonly float _pitchMax;
+        private readonly float _yawMin;
+        private readonly float _yawMax;
         private readonly float _recenterDelay;
         private readonly float _recenterSpeed;
 
@@ -26,11 +28,13 @@ namespace Project.Gameplay.Camera
 
         public Quaternion CurrentRotation => Quaternion.Euler(_pitch, _yaw, 0f);
 
-        public CameraOrbitSystem(float sensitivity, float pitchMin, float pitchMax, float recenterDelay, float recenterSpeed)
+        public CameraOrbitSystem(float sensitivity, float pitchMin, float pitchMax, float yawMin, float yawMax, float recenterDelay, float recenterSpeed)
         {
             _sensitivity = sensitivity;
             _pitchMin = pitchMin;
             _pitchMax = pitchMax;
+            _yawMin = yawMin;
+            _yawMax = yawMax;
             _recenterDelay = recenterDelay;
             _recenterSpeed = recenterSpeed;
         }
@@ -43,7 +47,7 @@ namespace Project.Gameplay.Camera
                 return;
             }
 
-            _yaw += delta.x * _sensitivity;
+            _yaw = Mathf.Clamp(_yaw + delta.x * _sensitivity, _yawMin, _yawMax);
             _pitch = Mathf.Clamp(_pitch - delta.y * _sensitivity, _pitchMin, _pitchMax);
             _timeSinceLastInput = 0f;
             _inputReceivedThisFrame = true;

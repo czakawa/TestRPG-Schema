@@ -40,6 +40,7 @@ namespace Project.Data
         [SerializeField] private ItemType itemType;
         [SerializeField] private float damageValue;
         [SerializeField] private float armorValue;
+        [SerializeField] private int basePrice;
 
         /// <summary>Unikalny identyfikator przedmiotu (np. "iron_sword") - niezależny od nazwy assetu.</summary>
         public string ItemId => itemId;
@@ -65,5 +66,12 @@ namespace Project.Data
         /// <summary>Sensowne tylko dla ItemType.Armor, ignorowane dla innych typów - tak samo luźne
         /// jak DamageValue, bez walidacji/enforce w edytorze.</summary>
         public float ArmorValue => armorValue;
+
+        /// <summary>Wartość bazowa do wyliczania ceny sprzedaży NPC (BasePrice * TraderData.SellMultiplier).
+        /// Cena ZAKUPU u danego NPC jest niezależna, ustalana per-handlarz w TradeStockEntry.Price -
+        /// ten sam przedmiot może kosztować inaczej u różnych kupców, ale sprzedaje się zawsze za
+        /// ten sam ułamek BasePrice niezależnie od tego, u kogo. 0 = przedmiot niesprzedawalny
+        /// (patrz NpcMerchant.TrySell).</summary>
+        public int BasePrice => basePrice;
     }
 }

@@ -17,24 +17,38 @@ namespace Project.Gameplay.Player
         private readonly float _moveSpeed;
         private readonly float _gravity;
         private readonly float _jumpHeight;
+        private readonly float _sprintMultiplier;
 
         private Vector2 _moveInput;
         private bool _jumpRequested;
+        private bool _isSprinting;
         private float _verticalVelocity;
 
-        public PlayerMotorSystem(CharacterController controller, Transform transform, float moveSpeed, float gravity, float jumpHeight)
+        public PlayerMotorSystem(CharacterController controller, Transform transform, float moveSpeed, float gravity, float jumpHeight, float sprintMultiplier = 1.6f)
         {
             _controller = controller;
             _transform = transform;
             _moveSpeed = moveSpeed;
             _gravity = gravity;
             _jumpHeight = jumpHeight;
+            _sprintMultiplier = sprintMultiplier;
         }
 
         /// <summary>Wywoływane przez bridge co klatkę z aktualną wartością akcji Move (-1..1 na oś).</summary>
         public void SetMoveInput(Vector2 moveInput)
         {
             _moveInput = moveInput;
+        }
+
+        /// <summary>
+        /// Wywoływane przez bridge co klatkę - czy w TEJ klatce należy zastosować sprintMultiplier.
+        /// Bridge już przesądził wszystko, co wymaga danych spoza tego czystego systemu (input Shift,
+        /// GameplayInputLock, TrySpendStamina na PlayerStatsSystem) - ten system tylko aplikuje mnożnik
+        /// do już obliczonej prędkości, nie wie nic o Staminie ani inpucie.
+        /// </summary>
+        public void SetSprinting(bool isSprinting)
+        {
+            _isSprinting = isSprinting;
         }
 
         /// <summary>Wywoływane przez bridge, gdy akcja Jump zostanie wykonana.</summary>
@@ -50,7 +64,8 @@ namespace Project.Gameplay.Player
 
         public void Tick(float deltaTime)
         {
-            Vector3 move = (_transform.right * _moveInput.x + _transform.forward * _moveInput.y) * _moveSpeed;
+            float speed = _isSprinting ? _moveSpeed * _sprintMultiplier : _moveSpeed;
+            Vector3 move = (_transform.right * _moveInput.x + _transform.forward * _moveInput.y) * speed;
 
             if (_controller.isGrounded)
             {

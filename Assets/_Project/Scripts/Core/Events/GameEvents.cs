@@ -240,4 +240,25 @@ namespace Project.Core.Events
     public readonly struct PlayerDiedEvent
     {
     }
+
+    /// <summary>
+    /// Publikowane przez <see cref="Project.Gameplay.Dialogue.DialogueSystem"/> w SelectOption, gdy
+    /// wybrana opcja ma OpensTrade == true, PRZED sprawdzeniem NextNodeIndex - analogicznie do
+    /// DialogueQuestActionEvent. Pusty sygnał: DialogueSystem nie wie nic o NpcMerchant/handlu,
+    /// więc nie mógłby i tak przekazać referencji do właściwego NPC. Odbiorca (TradeUIController)
+    /// odnajduje właściwego kupca przez <see cref="Project.Gameplay.Dialogue.NpcDialogueInteractable.ActiveSpeaker"/>,
+    /// nie przez dane w tym evencie.
+    /// </summary>
+    public readonly struct TradeRequestedEvent
+    {
+    }
+
+    /// <summary>
+    /// Publikowane przez <see cref="Project.Gameplay.Trade.NpcMerchant"/> po każdej udanej transakcji
+    /// (TryBuy/TrySell). Pusty sygnał - subskrybenci (TradeUIController) odczytują aktualny stan
+    /// przez referencję do NpcMerchant.Stock, tak samo jak InventoryChangedEvent/EquipmentChangedEvent.
+    /// </summary>
+    public readonly struct TradeStockChangedEvent
+    {
+    }
 }

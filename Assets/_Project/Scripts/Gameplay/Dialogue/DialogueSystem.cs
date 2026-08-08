@@ -55,9 +55,11 @@ namespace Project.Gameplay.Dialogue
         /// Wybiera opcję o danym indeksie w aktualnym węźle. Jeśli opcja niesie QuestAction != None,
         /// publikuje DialogueQuestActionEvent PRZED przejściem dalej - DialogueSystem celowo nie ma
         /// twardej referencji do QuestSystem (systemy komunikują się przez EventBus), więc samo
-        /// rozpoczęcie/oddanie questa wykonuje QuestBridge w reakcji na ten event. Następnie:
-        /// NextNodeIndex == -1 kończy rozmowę (patrz EndDialogue), inaczej przechodzi do wskazanego
-        /// węzła i publikuje DialogueNodeChangedEvent.
+        /// rozpoczęcie/oddanie questa wykonuje QuestBridge w reakcji na ten event. Analogicznie,
+        /// jeśli opcja ma OpensTrade == true, publikuje TradeRequestedEvent - DialogueSystem nie wie
+        /// nic o NpcMerchant/handlu, quest i trade mogą teoretycznie współistnieć na tej samej opcji
+        /// (nie są wzajemnie wykluczające). Następnie: NextNodeIndex == -1 kończy rozmowę (patrz
+        /// EndDialogue), inaczej przechodzi do wskazanego węzła i publikuje DialogueNodeChangedEvent.
         /// </summary>
         public void SelectOption(int optionIndex)
         {
@@ -77,6 +79,11 @@ namespace Project.Gameplay.Dialogue
             if (option.QuestAction != QuestActionType.None)
             {
                 EventBus.Publish(new DialogueQuestActionEvent(option.QuestAction, option.TargetQuest));
+            }
+
+            if (option.OpensTrade)
+            {
+                EventBus.Publish(new TradeRequestedEvent());
             }
 
             if (option.NextNodeIndex == -1)

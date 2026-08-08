@@ -1,5 +1,6 @@
 using Project.Core.Events;
 using Project.Core.Systems;
+using UnityEngine;
 
 namespace Project.Gameplay.Stats
 {
@@ -69,12 +70,21 @@ namespace Project.Gameplay.Stats
         private readonly int _startingDexterity;
         private readonly int _startingEndurance;
         private readonly int _startingWisdom;
+        private readonly float _staminaRegenRate;
+        private readonly float _staminaRegenDelay;
 
         private int _strength;
         private int _dexterity;
         private int _endurance;
         private int _wisdom;
         private bool _isDead;
+        private float _timeSinceStaminaUse;
+
+        // Reszta ułamkowa nieodzwierciedlona jeszcze w Stamina.Current (int), zawsze w [0, 1).
+        // Konieczna, bo koszt sprintu/regeneracja liczone są per-klatkę (np. 15 * Time.deltaTime =~
+        // 0.24) - bez tego bufora naiwne zaokrąglenie do int przed każdym Vital.Add dawałoby niemal
+        // zawsze 0 i sprint/regen nigdy by faktycznie nie zmieniły Stamina.Current.
+        private float _staminaFraction;
 
         public Vital Health { get; private set; }
         public Vital Stamina { get; private set; }
@@ -92,7 +102,9 @@ namespace Project.Gameplay.Stats
             int startingStrength = 10,
             int startingDexterity = 10,
             int startingEndurance = 10,
-            int startingWisdom = 10)
+            int startingWisdom = 10,
+            float staminaRegenRate = 10f,
+            float staminaRegenDelay = 2f)
         {
             _startingHealth = startingHealth;
             _startingStamina = startingStamina;
@@ -101,6 +113,8 @@ namespace Project.Gameplay.Stats
             _startingDexterity = startingDexterity;
             _startingEndurance = startingEndurance;
             _startingWisdom = startingWisdom;
+            _staminaRegenRate = staminaRegenRate;
+            _staminaRegenDelay = staminaRegenDelay;
         }
 
         public void Initialize()
@@ -114,10 +128,27 @@ namespace Project.Gameplay.Stats
             _endurance = _startingEndurance;
             _wisdom = _startingWisdom;
             _isDead = false;
+            _timeSinceStaminaUse = 0f;
+            _staminaFraction = 0f;
         }
 
         public void Tick(float deltaTime)
         {
+            if (Stamina.Current < Stamina.Max)
+            {
+                _timeSinceStaminaUse += deltaTime;
+
+                if (_timeSinceStaminaUse >= _staminaRegenDelay)
+                {
+                    int previousCurrent = Stamina.Current;
+                    ApplyStaminaDelta(_staminaRegenRate * deltaTime);
+
+                    if (Stamina.Current != previousCurrent)
+                    {
+                        EventBus.Publish(new StatsChangedEvent());
+                    }
+                }
+            }
         }
 
         public void FixedTick(float fixedDeltaTime)
@@ -146,6 +177,48 @@ namespace Project.Gameplay.Stats
         {
             Stamina.Add(delta);
             EventBus.Publish(new StatsChangedEvent());
+        }
+
+        /// <summary>
+        /// Współdzielona metoda zużycia Staminy - używana zarówno przez sprint (wołana co klatkę
+        /// z małą wartością: staminaCostPerSecond * deltaTime) jak i przez atak (wołana raz,
+        /// z większą wartością), żeby nie duplikować logiki odejmowania w dwóch miejscach. Sprawdza
+        /// tylko Stamina.Current (int), nie uwzględniając _staminaFraction - to sprawdzenie jest więc
+        /// lekko konserwatywne (może odmówić przy &lt;1 jednostce zapasu), ale nigdy nie pozwoli
+        /// zejść poniżej zera. Resetuje _timeSinceStaminaUse, więc regeneracja zacznie się dopiero
+        /// po staminaRegenDelay od OSTATNIEGO udanego zużycia (sprint trzymany ciągle bez przerwy
+        /// odsuwa start regeneracji w nieskończoność, zgodnie z zamierzeniem).
+        /// </summary>
+        public bool TrySpendStamina(float amount)
+        {
+            if (Stamina.Current < amount)
+            {
+                return false;
+            }
+
+            ApplyStaminaDelta(-amount);
+            _timeSinceStaminaUse = 0f;
+            EventBus.Publish(new StatsChangedEvent());
+            return true;
+        }
+
+        /// <summary>
+        /// Wspólny mechanizm dla TrySpendStamina i regeneracji w Tick: dokłada deltę (dodatnią lub
+        /// ujemną) do _staminaFraction, wyciąga z niej całkowitą liczbę jednostek przez Mathf.FloorToInt
+        /// (poprawne dla obu znaków - zachowuje niezmiennik Stamina.Current == floor(prawdziwa wartość))
+        /// i tylko tę całkowitą część aplikuje przez istniejące Vital.Add (zachowując jego clamp do
+        /// [0, Max]). Reszta ułamkowa zawsze zostaje w [0, 1).
+        /// </summary>
+        private void ApplyStaminaDelta(float delta)
+        {
+            float trueDelta = _staminaFraction + delta;
+            int wholeUnits = Mathf.FloorToInt(trueDelta);
+            _staminaFraction = trueDelta - wholeUnits;
+
+            if (wholeUnits != 0)
+            {
+                Stamina.Add(wholeUnits);
+            }
         }
 
         public void ModifyMana(int delta)

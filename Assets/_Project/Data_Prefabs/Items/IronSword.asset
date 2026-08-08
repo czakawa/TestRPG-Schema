@@ -20,3 +20,5 @@ MonoBehaviour:
   maxStackSize: 1
   itemType: 0
   damageValue: 15
+  armorValue: 0
+  basePrice: 30

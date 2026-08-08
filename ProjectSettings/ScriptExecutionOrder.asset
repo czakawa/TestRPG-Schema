@@ -1,0 +1,8 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1006 &1
+ScriptExecutionOrder:
+  m_ObjectHideFlags: 0
+  m_Scripts:
+  - script: {fileID: 11500000, guid: ebd2a6389e81e674d89e3574644fe873, type: 3}
+    executionOrder: -100

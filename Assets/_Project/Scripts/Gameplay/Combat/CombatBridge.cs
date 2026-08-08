@@ -2,6 +2,7 @@ using Project.Core;
 using Project.Core.States;
 using Project.Gameplay.Camera;
 using Project.Gameplay.Equipment;
+using Project.Gameplay.Stats;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -23,8 +24,10 @@ namespace Project.Gameplay.Combat
         [SerializeField] private Transform attackOrigin;
         [SerializeField] private CameraOrbitBridge cameraOrbitBridge;
         [SerializeField] private EquipmentBridge equipmentBridge;
+        [SerializeField] private PlayerStatsBridge playerStatsBridge;
         [SerializeField] private float attackRange = 2f;
         [SerializeField] private float baseUnarmedDamage = 5f;
+        [SerializeField] private float attackStaminaCost = 15f;
         [SerializeField] private LayerMask enemyLayer;
         [SerializeField] private InputActionReference attackAction;
 
@@ -67,7 +70,10 @@ namespace Project.Gameplay.Combat
         /// się poruszać. Dodatkowy guard na CurrentState == GameOver jest konieczny osobno: atak jest
         /// wyzwalany z callbacku Input Actions (attackAction.performed), nie z pętli GameSystemsManager,
         /// więc SetSystemsActive(false) w GameOverState go nie zatrzymuje - bez tego sprawdzenia gracz
-        /// mógłby dalej zadawać obrażenia wrogom z poziomu ekranu Game Over.
+        /// mógłby dalej zadawać obrażenia wrogom z poziomu ekranu Game Over. Sprawdzenie Staminy
+        /// (TrySpendStamina) jest CELOWO ostatnim guardem, po pozostałych: to jedyny z tej listy,
+        /// który ma efekt uboczny przy sukcesie (zużywa Staminę), więc nie ma sensu go wołać, jeśli
+        /// atak i tak nie dojdzie do skutku z innego powodu.
         /// </summary>
         private void OnAttackPerformed(InputAction.CallbackContext context)
         {
@@ -77,6 +83,11 @@ namespace Project.Gameplay.Combat
             }
 
             if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameStateType.GameOver)
+            {
+                return;
+            }
+
+            if (playerStatsBridge == null || !playerStatsBridge.Stats.TrySpendStamina(attackStaminaCost))
             {
                 return;
             }

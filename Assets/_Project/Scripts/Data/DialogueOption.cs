@@ -26,6 +26,7 @@ namespace Project.Data
         [SerializeField] private int nextNodeIndex = -1;
         [SerializeField] private QuestActionType questAction = QuestActionType.None;
         [SerializeField] private QuestData targetQuest;
+        [SerializeField] private bool opensTrade;
 
         public string OptionText => optionText;
 
@@ -37,5 +38,10 @@ namespace Project.Data
 
         /// <summary>Quest, którego dotyczy QuestAction. Ignorowane, jeśli QuestAction == None.</summary>
         public QuestData TargetQuest => targetQuest;
+
+        /// <summary>Czy wybranie tej opcji publikuje TradeRequestedEvent (otwiera panel handlu z tym NPC).
+        /// Niezależne od QuestAction/NextNodeIndex - może współistnieć z akcją questową na tej samej
+        /// opcji, i typowo kończy rozmowę (NextNodeIndex == -1) w tym samym wyborze.</summary>
+        public bool OpensTrade => opensTrade;
     }
 }
