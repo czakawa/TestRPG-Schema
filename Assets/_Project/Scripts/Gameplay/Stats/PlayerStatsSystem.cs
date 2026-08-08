@@ -74,6 +74,7 @@ namespace Project.Gameplay.Stats
         private int _dexterity;
         private int _endurance;
         private int _wisdom;
+        private bool _isDead;
 
         public Vital Health { get; private set; }
         public Vital Stamina { get; private set; }
@@ -112,6 +113,7 @@ namespace Project.Gameplay.Stats
             _dexterity = _startingDexterity;
             _endurance = _startingEndurance;
             _wisdom = _startingWisdom;
+            _isDead = false;
         }
 
         public void Tick(float deltaTime)
@@ -130,6 +132,14 @@ namespace Project.Gameplay.Stats
         {
             Health.Add(delta);
             EventBus.Publish(new StatsChangedEvent());
+
+            // Publikacja tylko przy przejściu >0 -> 0, nie przy każdym kolejnym ModifyHealth(-X)
+            // wołanym, gdy HP jest już na zerze (np. wielokrotne trafienia w tej samej klatce).
+            if (!_isDead && Health.Current == 0)
+            {
+                _isDead = true;
+                EventBus.Publish(new PlayerDiedEvent());
+            }
         }
 
         public void ModifyStamina(int delta)

@@ -1,5 +1,6 @@
 using Project.Core.States;
 using Project.Data;
+using UnityEngine;
 
 namespace Project.Core.Events
 {
@@ -195,5 +196,48 @@ namespace Project.Core.Events
             Action = action;
             Quest = quest;
         }
+    }
+
+    /// <summary>
+    /// Publikowane przez <see cref="Project.Gameplay.Combat.CombatSystem"/> po trafieniu ataku gracza
+    /// w obiekt implementujący IDamageable. Niesie referencję do trafionego GameObject, nie do
+    /// ScriptableObject jak pozostałe eventy - to świadomy wyjątek: celem ataku jest zawsze obiekt
+    /// sceny (wróg), a nie dana konfiguracyjna w rodzaju ItemData/QuestData.
+    /// </summary>
+    public readonly struct EnemyDamagedEvent
+    {
+        public readonly GameObject Target;
+        public readonly float Damage;
+
+        public EnemyDamagedEvent(GameObject target, float damage)
+        {
+            Target = target;
+            Damage = damage;
+        }
+    }
+
+    /// <summary>
+    /// Publikowane przez <see cref="Project.Gameplay.Combat.EnemyController"/>, gdy HP wroga spadnie
+    /// do zera (TakeDamage). Wróg jest niszczony z małym opóźnieniem po publikacji tego eventu, żeby
+    /// subskrybenci (przyszły loot/questy) zdążyli odczytać jego stan w tej samej klatce.
+    /// </summary>
+    public readonly struct EnemyDiedEvent
+    {
+        public readonly GameObject Enemy;
+
+        public EnemyDiedEvent(GameObject enemy)
+        {
+            Enemy = enemy;
+        }
+    }
+
+    /// <summary>
+    /// Publikowane przez <see cref="Project.Gameplay.Stats.PlayerStatsSystem"/>, gdy Health.Current
+    /// spadnie do zera (ModifyHealth), dokładnie raz na przejście z >0 na 0. Pusty sygnał -
+    /// subskrybenci (PlayerDeathHandler zmieniający stan gry na GameOver, GameOverUIController
+    /// pokazujący panel) nie potrzebują żadnych danych z eventu, tylko samego faktu śmierci.
+    /// </summary>
+    public readonly struct PlayerDiedEvent
+    {
     }
 }

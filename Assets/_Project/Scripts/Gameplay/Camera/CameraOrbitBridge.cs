@@ -1,4 +1,5 @@
 using Project.Core;
+using Project.Core.States;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -57,9 +58,20 @@ namespace Project.Gameplay.Camera
             }
         }
 
+        /// <summary>
+        /// Guard na CurrentState == GameOver jest tu konieczny osobno od GameplayInputLock:
+        /// AddLookInput mutuje stan CameraOrbitSystem bezpośrednio z tego Update(), nie przez
+        /// GameSystemsManager.Tick, więc SetSystemsActive(false) w GameOverState w ogóle go nie
+        /// dotyczy - bez tego sprawdzenia kamera dalej obracałaby się swobodnie na ekranie Game Over.
+        /// </summary>
         private void Update()
         {
             if (GameplayInputLock.IsCameraLocked)
+            {
+                return;
+            }
+
+            if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameStateType.GameOver)
             {
                 return;
             }
