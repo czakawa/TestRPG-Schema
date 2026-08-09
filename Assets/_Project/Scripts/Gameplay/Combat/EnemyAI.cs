@@ -16,6 +16,7 @@ namespace Project.Gameplay.Combat
     /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
     [RequireComponent(typeof(EnemyController))]
+    [RequireComponent(typeof(EnemyAnimatorBridge))]
     public class EnemyAI : MonoBehaviour
     {
         private const float PatrolArrivalThreshold = 0.3f;
@@ -31,6 +32,7 @@ namespace Project.Gameplay.Combat
 
         private NavMeshAgent _agent;
         private EnemyController _enemyController;
+        private EnemyAnimatorBridge _animatorBridge;
         private Transform _playerTransform;
         private PlayerStatsBridge _playerStatsBridge;
 
@@ -44,6 +46,7 @@ namespace Project.Gameplay.Combat
         {
             _agent = GetComponent<NavMeshAgent>();
             _enemyController = GetComponent<EnemyController>();
+            _animatorBridge = GetComponent<EnemyAnimatorBridge>();
         }
 
         private void Start()
@@ -131,6 +134,7 @@ namespace Project.Gameplay.Combat
             if (Time.time - _lastAttackTime >= attackCooldown)
             {
                 _playerStatsBridge.TakeDamage(attackDamage);
+                _animatorBridge.TriggerAttack();
                 _lastAttackTime = Time.time;
             }
         }

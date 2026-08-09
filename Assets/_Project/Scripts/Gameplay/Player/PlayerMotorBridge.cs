@@ -38,6 +38,9 @@ namespace Project.Gameplay.Player
         private InputAction _jumpAction;
         private InputAction _sprintAction;
 
+        public float CurrentVelocityX => _motorSystem.CurrentVelocityX;
+        public float CurrentVelocityZ => _motorSystem.CurrentVelocityZ;
+
         private void Awake()
         {
             if (controller == null)

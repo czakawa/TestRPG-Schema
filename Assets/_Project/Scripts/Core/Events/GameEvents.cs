@@ -28,10 +28,12 @@ namespace Project.Core.Events
     public readonly struct InteractableFocusedEvent
     {
         public readonly string Prompt;
+        public readonly GameObject Target;
 
-        public InteractableFocusedEvent(string prompt)
+        public InteractableFocusedEvent(string prompt, GameObject target)
         {
             Prompt = prompt;
+            Target = target;
         }
     }
 
@@ -238,6 +240,15 @@ namespace Project.Core.Events
     /// pokazujący panel) nie potrzebują żadnych danych z eventu, tylko samego faktu śmierci.
     /// </summary>
     public readonly struct PlayerDiedEvent
+    {
+    }
+
+    /// <summary>
+    /// Publikowane przez <see cref="Project.Gameplay.Combat.CombatBridge"/> zaraz po wykonaniu ataku
+    /// gracza (PerformAttack). Pusty sygnał - subskrybenci (AnimatorBridge) nie potrzebują żadnych
+    /// danych z eventu, tylko samego faktu, że atak został wykonany, żeby wyzwolić trigger animacji.
+    /// </summary>
+    public struct PlayerAttackPerformedEvent
     {
     }
 

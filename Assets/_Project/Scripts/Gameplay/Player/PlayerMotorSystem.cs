@@ -23,6 +23,11 @@ namespace Project.Gameplay.Player
         private bool _jumpRequested;
         private bool _isSprinting;
         private float _verticalVelocity;
+        private float _lastVelocityX;
+        private float _lastVelocityZ;
+
+        public float CurrentVelocityX => _lastVelocityX;
+        public float CurrentVelocityZ => _lastVelocityZ;
 
         public PlayerMotorSystem(CharacterController controller, Transform transform, float moveSpeed, float gravity, float jumpHeight, float sprintMultiplier = 1.6f)
         {
@@ -65,6 +70,8 @@ namespace Project.Gameplay.Player
         public void Tick(float deltaTime)
         {
             float speed = _isSprinting ? _moveSpeed * _sprintMultiplier : _moveSpeed;
+            _lastVelocityX = _moveInput.x * speed;
+            _lastVelocityZ = _moveInput.y * speed;
             Vector3 move = (_transform.right * _moveInput.x + _transform.forward * _moveInput.y) * speed;
 
             if (_controller.isGrounded)

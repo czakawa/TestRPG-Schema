@@ -41,6 +41,7 @@ namespace Project.Data
         [SerializeField] private float damageValue;
         [SerializeField] private float armorValue;
         [SerializeField] private int basePrice;
+        [SerializeField] private GameObject weaponPrefab;
 
         /// <summary>Unikalny identyfikator przedmiotu (np. "iron_sword") - niezależny od nazwy assetu.</summary>
         public string ItemId => itemId;
@@ -73,5 +74,10 @@ namespace Project.Data
         /// ten sam ułamek BasePrice niezależnie od tego, u kogo. 0 = przedmiot niesprzedawalny
         /// (patrz NpcMerchant.TrySell).</summary>
         public int BasePrice => basePrice;
+
+        /// <summary>Sensowne tylko dla ItemType.Weapon - prefab wizualnego modelu broni, instancjonowany
+        /// w dłoni gracza przez WeaponVisualBridge po założeniu. Może być null, jeśli broń nie ma jeszcze
+        /// gotowego modelu (broń wtedy po prostu nie pojawia się wizualnie, ale działa mechanicznie).</summary>
+        public GameObject WeaponPrefab => weaponPrefab;
     }
 }

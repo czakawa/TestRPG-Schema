@@ -53,6 +53,7 @@ namespace Project.Gameplay.Interaction
             IInteractable hitInteractable = hitCount > 0
                 ? _hitBuffer[0].collider.GetComponentInParent<IInteractable>()
                 : null;
+            GameObject hitGameObject = hitInteractable != null ? ((Component)hitInteractable).gameObject : null;
 
             if (ReferenceEquals(hitInteractable, _focusedInteractable))
             {
@@ -63,7 +64,7 @@ namespace Project.Gameplay.Interaction
 
             if (_focusedInteractable != null)
             {
-                EventBus.Publish(new InteractableFocusedEvent(_focusedInteractable.GetInteractionPrompt()));
+                EventBus.Publish(new InteractableFocusedEvent(_focusedInteractable.GetInteractionPrompt(), hitGameObject));
             }
             else
             {

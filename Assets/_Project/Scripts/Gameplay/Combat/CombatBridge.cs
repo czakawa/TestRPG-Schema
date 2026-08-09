@@ -1,4 +1,5 @@
 using Project.Core;
+using Project.Core.Events;
 using Project.Core.States;
 using Project.Gameplay.Camera;
 using Project.Gameplay.Equipment;
@@ -21,6 +22,8 @@ namespace Project.Gameplay.Combat
     /// </summary>
     public class CombatBridge : MonoBehaviour
     {
+        private const string AttackLockReason = "Attack";
+
         [SerializeField] private Transform attackOrigin;
         [SerializeField] private CameraOrbitBridge cameraOrbitBridge;
         [SerializeField] private EquipmentBridge equipmentBridge;
@@ -28,10 +31,12 @@ namespace Project.Gameplay.Combat
         [SerializeField] private float attackRange = 2f;
         [SerializeField] private float baseUnarmedDamage = 5f;
         [SerializeField] private float attackStaminaCost = 15f;
+        [SerializeField] private float attackCooldown = 0.8f;
         [SerializeField] private LayerMask enemyLayer;
         [SerializeField] private InputActionReference attackAction;
 
         private CombatSystem _combatSystem;
+        private float _lastAttackTime = -999f;
 
         private void Awake()
         {
@@ -61,6 +66,9 @@ namespace Project.Gameplay.Combat
             {
                 GameManager.Instance.Systems.UnregisterSystem(_combatSystem);
             }
+
+            CancelInvoke(nameof(UnlockMovementAfterAttack));
+            GameplayInputLock.UnlockMovement(AttackLockReason);
         }
 
         /// <summary>
@@ -77,6 +85,11 @@ namespace Project.Gameplay.Combat
         /// </summary>
         private void OnAttackPerformed(InputAction.CallbackContext context)
         {
+            if (Time.time - _lastAttackTime < attackCooldown)
+            {
+                return;
+            }
+
             if (GameplayInputLock.IsMovementLocked)
             {
                 return;
@@ -93,6 +106,10 @@ namespace Project.Gameplay.Combat
             }
 
             _combatSystem.PerformAttack(attackOrigin.position, cameraOrbitBridge.CurrentLookRotation * Vector3.forward, GetAttackDamage());
+            EventBus.Publish(new PlayerAttackPerformedEvent());
+            _lastAttackTime = Time.time;
+            GameplayInputLock.LockMovement(AttackLockReason);
+            Invoke(nameof(UnlockMovementAfterAttack), attackCooldown);
         }
 
         /// <summary>Odczytane dopiero tutaj, nie w Awake/OnEnable - tak samo jak cameraOrbitBridge
@@ -106,6 +123,11 @@ namespace Project.Gameplay.Combat
             }
 
             return baseUnarmedDamage;
+        }
+
+        private void UnlockMovementAfterAttack()
+        {
+            GameplayInputLock.UnlockMovement(AttackLockReason);
         }
     }
 }

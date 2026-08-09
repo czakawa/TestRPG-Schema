@@ -13,8 +13,10 @@ namespace Project.Gameplay.Combat
     public class EnemyController : MonoBehaviour, IDamageable
     {
         [SerializeField] private float maxHealth = 50f;
+        [SerializeField] private float deathDestroyDelay = 2.5f;
 
         private float _currentHealth;
+        private EnemyAnimatorBridge _animatorBridge;
 
         public bool IsDead { get; private set; }
 
@@ -27,6 +29,7 @@ namespace Project.Gameplay.Combat
         private void Awake()
         {
             _currentHealth = maxHealth;
+            _animatorBridge = GetComponent<EnemyAnimatorBridge>();
         }
 
         public void TakeDamage(float amount)
@@ -41,8 +44,9 @@ namespace Project.Gameplay.Combat
             if (_currentHealth <= 0f)
             {
                 IsDead = true;
+                _animatorBridge.TriggerDeath();
                 EventBus.Publish(new EnemyDiedEvent(gameObject));
-                Destroy(gameObject, 0.1f);
+                Destroy(gameObject, deathDestroyDelay);
             }
         }
     }
