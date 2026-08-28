@@ -1,5 +1,6 @@
 using Project.Core.States;
 using Project.Data;
+using Project.Gameplay.Stats;
 using UnityEngine;
 
 namespace Project.Core.Events
@@ -126,6 +127,23 @@ namespace Project.Core.Events
     }
 
     /// <summary>
+    /// Publikowane przez <see cref="Project.Gameplay.Equipment.WeaponVisualBridge"/> po ręcznym
+    /// przełączeniu stanu Dobyta/Schowana (akcja Draw), wyłącznie gdy stan faktycznie się zmienił.
+    /// Nie publikowane przy świeżym założeniu broni (RefreshWeaponVisual ustawia _isDrawn = false
+    /// bezpośrednio) - subskrybenci (AnimatorBridge) mają grać animację dobycia tylko na akcję
+    /// gracza, nie przy każdej zmianie ekwipunku.
+    /// </summary>
+    public readonly struct WeaponDrawStateChangedEvent
+    {
+        public readonly bool IsDrawn;
+
+        public WeaponDrawStateChangedEvent(bool isDrawn)
+        {
+            IsDrawn = isDrawn;
+        }
+    }
+
+    /// <summary>
     /// Publikowane przez <see cref="Project.Gameplay.Quests.QuestSystem"/>, gdy quest zostaje
     /// rozpoczęty (StartQuest).
     /// </summary>
@@ -244,6 +262,21 @@ namespace Project.Core.Events
     }
 
     /// <summary>
+    /// Publikowane przez <see cref="Project.Gameplay.Stats.PlayerStatsSystem"/> w AddExperience, za
+    /// każdym razem gdy nagromadzone doświadczenie przekroczy próg kolejnego poziomu (może odpalić
+    /// się wielokrotnie w jednym wywołaniu AddExperience, jeśli gracz dostał dużo XP naraz).
+    /// </summary>
+    public readonly struct LevelUpEvent
+    {
+        public readonly int NewLevel;
+
+        public LevelUpEvent(int newLevel)
+        {
+            NewLevel = newLevel;
+        }
+    }
+
+    /// <summary>
     /// Publikowane przez <see cref="Project.Gameplay.Combat.CombatBridge"/> zaraz po wykonaniu ataku
     /// gracza (PerformAttack). Pusty sygnał - subskrybenci (AnimatorBridge) nie potrzebują żadnych
     /// danych z eventu, tylko samego faktu, że atak został wykonany, żeby wyzwolić trigger animacji.
@@ -262,6 +295,22 @@ namespace Project.Core.Events
     /// </summary>
     public readonly struct TradeRequestedEvent
     {
+    }
+
+    /// <summary>
+    /// Publikowane przez <see cref="Project.Gameplay.Dialogue.DialogueSystem"/> w SelectOption, gdy
+    /// wybrana opcja ma TriggersTraining == true - analogicznie do TradeRequestedEvent, ale niosące
+    /// dodatkowo atrybut do wytrenowania. Subskrybent (NpcTrainer) odnajduje właściwego nauczyciela
+    /// przez NpcDialogueInteractable.ActiveSpeaker, tak samo jak NpcMerchant przy handlu.
+    /// </summary>
+    public readonly struct TrainingRequestedEvent
+    {
+        public readonly AttributeType Attribute;
+
+        public TrainingRequestedEvent(AttributeType attribute)
+        {
+            Attribute = attribute;
+        }
     }
 
     /// <summary>

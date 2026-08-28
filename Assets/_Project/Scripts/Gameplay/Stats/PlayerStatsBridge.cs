@@ -1,5 +1,7 @@
 using Project.Core;
+using Project.Core.Events;
 using Project.Data;
+using Project.Gameplay.Combat;
 using Project.Gameplay.Equipment;
 using UnityEngine;
 
@@ -16,7 +18,7 @@ namespace Project.Gameplay.Stats
     /// ze sobą dwa czyste systemy bez potrzeby (PlayerStatsSystem nie musi nic wiedzieć
     /// o ekwipunku - tylko most, który i tak już zna oba, potrzebuje tej wiedzy).
     /// </summary>
-    public class PlayerStatsBridge : MonoBehaviour
+    public class PlayerStatsBridge : MonoBehaviour, IDamageable
     {
         [SerializeField] private int startingHealth = 100;
         [SerializeField] private int startingStamina = 100;
@@ -27,12 +29,19 @@ namespace Project.Gameplay.Stats
         [SerializeField] private int startingWisdom = 10;
         [SerializeField] private float staminaRegenRate = 10f;
         [SerializeField] private float staminaRegenDelay = 2f;
+        [SerializeField] private int xpPerLevelBase = 100;
+        [SerializeField] private int xpPerLevelIncrease = 50;
+        [SerializeField] private int learningPointsPerLevel = 5;
         [SerializeField] private EquipmentBridge equipmentBridge;
 
         private PlayerStatsSystem _statsSystem;
 
         /// <summary>Referencja do systemu statystyk gracza - do użytku przez UI (CharacterPanelUI) i przyszłe systemy.</summary>
         public PlayerStatsSystem Stats => _statsSystem;
+
+        /// <summary>Implementacja IDamageable - deleguje do PlayerStatsSystem.IsDead. Potrzebne, żeby
+        /// MeleeHitbox (uniwersalny dla gracza i wroga) mógł traktować gracza tak samo jak EnemyController.</summary>
+        public bool IsDead => _statsSystem.IsDead;
 
         private void Awake()
         {
@@ -45,7 +54,10 @@ namespace Project.Gameplay.Stats
                 startingEndurance,
                 startingWisdom,
                 staminaRegenRate,
-                staminaRegenDelay);
+                staminaRegenDelay,
+                xpPerLevelBase,
+                xpPerLevelIncrease,
+                learningPointsPerLevel);
         }
 
         private void OnEnable()
@@ -57,6 +69,7 @@ namespace Project.Gameplay.Stats
             }
 
             GameManager.Instance.Systems.RegisterSystem(_statsSystem);
+            EventBus.Subscribe<EnemyDiedEvent>(OnEnemyDied);
         }
 
         private void OnDisable()
@@ -65,6 +78,8 @@ namespace Project.Gameplay.Stats
             {
                 GameManager.Instance.Systems.UnregisterSystem(_statsSystem);
             }
+
+            EventBus.Unsubscribe<EnemyDiedEvent>(OnEnemyDied);
         }
 
         /// <summary>
@@ -88,6 +103,15 @@ namespace Project.Gameplay.Stats
                 : rawDamage;
 
             _statsSystem.ModifyHealth(-Mathf.RoundToInt(finalDamage));
+        }
+
+        private void OnEnemyDied(EnemyDiedEvent evt)
+        {
+            EnemyController enemyController = evt.Enemy.GetComponent<EnemyController>();
+            if (enemyController != null)
+            {
+                _statsSystem.AddExperience(enemyController.XpReward);
+            }
         }
     }
 }

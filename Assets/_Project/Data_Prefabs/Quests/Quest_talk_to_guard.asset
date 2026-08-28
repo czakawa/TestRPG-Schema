@@ -24,3 +24,4 @@ MonoBehaviour:
     goldAmount: 6
     rewardItem: {fileID: 11400000, guid: 2469eacfa8028194d831cedd389eed2d, type: 2}
     rewardItemQuantity: 1
+    xpAmount: 50

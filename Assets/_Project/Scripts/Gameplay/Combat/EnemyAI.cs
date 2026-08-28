@@ -29,6 +29,7 @@ namespace Project.Gameplay.Combat
         [SerializeField] private float attackDamage = 8f;
         [SerializeField] private float attackCooldown = 1.5f;
         [SerializeField] private float patrolWaitTime = 2f;
+        [SerializeField] private MeleeHitbox attackHitbox;
 
         private NavMeshAgent _agent;
         private EnemyController _enemyController;
@@ -133,9 +134,9 @@ namespace Project.Gameplay.Combat
 
             if (Time.time - _lastAttackTime >= attackCooldown)
             {
-                _playerStatsBridge.TakeDamage(attackDamage);
-                _animatorBridge.TriggerAttack();
                 _lastAttackTime = Time.time;
+                attackHitbox.SetDamage(attackDamage);
+                _animatorBridge.TriggerAttack();
             }
         }
 
@@ -172,6 +173,16 @@ namespace Project.Gameplay.Combat
             return _playerTransform != null
                 ? Vector3.Distance(transform.position, _playerTransform.position)
                 : Mathf.Infinity;
+        }
+
+        public void OnAttackWindowStart()
+        {
+            attackHitbox.Activate();
+        }
+
+        public void OnAttackWindowEnd()
+        {
+            attackHitbox.Deactivate();
         }
     }
 }

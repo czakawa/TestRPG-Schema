@@ -24,3 +24,4 @@ MonoBehaviour:
     goldAmount: 4
     rewardItem: {fileID: 0}
     rewardItemQuantity: 1
+    xpAmount: 50

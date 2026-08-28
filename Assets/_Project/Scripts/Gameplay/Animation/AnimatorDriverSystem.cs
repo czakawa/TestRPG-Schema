@@ -14,6 +14,9 @@ namespace Project.Gameplay.Animation
         private static readonly int VelocityZParam = Animator.StringToHash("VelocityZ");
         private static readonly int AttackTriggerParam = Animator.StringToHash("Attack");
         private static readonly int DeathTriggerParam = Animator.StringToHash("Death");
+        private static readonly int IsArmedParam = Animator.StringToHash("IsArmed");
+        private static readonly int DrawTriggerParam = Animator.StringToHash("Draw");
+        private static readonly int SheatheTriggerParam = Animator.StringToHash("Sheathe");
 
         private readonly Animator _animator;
         private readonly float _speedDampTime;
@@ -42,6 +45,21 @@ namespace Project.Gameplay.Animation
         public void TriggerDeath()
         {
             _animator.SetTrigger(DeathTriggerParam);
+        }
+
+        public void SetArmed(bool isArmed)
+        {
+            _animator.SetBool(IsArmedParam, isArmed);
+        }
+
+        public void TriggerDraw()
+        {
+            _animator.SetTrigger(DrawTriggerParam);
+        }
+
+        public void TriggerSheathe()
+        {
+            _animator.SetTrigger(SheatheTriggerParam);
         }
 
         public void Initialize()

@@ -6,10 +6,12 @@ using Project.Gameplay.Inventory;
 namespace Project.Gameplay.Equipment
 {
     /// <summary>
-    /// Czysta klasa C# (nie MonoBehaviour) zarządzająca trzema slotami ekwipunku zakładanego
-    /// (broń/zbroja/biżuteria). Zakładanie i zdejmowanie przechodzi przez InventorySystem tego
-    /// samego gracza - założony przedmiot fizycznie opuszcza plecak, dopóki nie zostanie zdjęty.
-    /// Brak bonusów statystyk z ekwipunku - to świadomie poza zakresem (przyszły Combat System).
+    /// Czysta klasa C# zarządzająca pięcioma slotami ekwipunku zakładanego (broń/zbroja/2 pierścienie/
+    /// naszyjnik). TryEquip sam wylicza docelowy EquipmentSlot z ItemType/JewelryType przedmiotu -
+    /// wywołujący (UI) nie musi wiedzieć nic o slotach, po prostu przekazuje ItemData, tak jak
+    /// dotychczas. Pierścień trafia do pierwszego wolnego slotu (Ring1 potem Ring2); jeśli oba zajęte,
+    /// zastępuje Ring1 - świadomie, zamiast wymuszać na graczu wybór konkretnego slotu (może zdjąć
+    /// niechciany pierścień ręcznie, jeśli automatyczny wybór mu nie odpowiada).
     /// </summary>
     public class EquipmentSystem : IGameSystem
     {
@@ -17,7 +19,9 @@ namespace Project.Gameplay.Equipment
 
         public ItemData EquippedWeapon { get; private set; }
         public ItemData EquippedArmor { get; private set; }
-        public ItemData EquippedJewelry { get; private set; }
+        public ItemData EquippedRing1 { get; private set; }
+        public ItemData EquippedRing2 { get; private set; }
+        public ItemData EquippedNecklace { get; private set; }
 
         public EquipmentSystem(InventorySystem inventorySystem)
         {
@@ -40,12 +44,6 @@ namespace Project.Gameplay.Equipment
         {
         }
 
-        /// <summary>
-        /// Próbuje założyć przedmiot z ekwipunku: zdejmuje go z InventorySystem, a jeśli docelowy
-        /// slot jest już zajęty, próbuje najpierw zwrócić stary przedmiot z powrotem do ekwipunku.
-        /// Jeśli zwrot się nie uda (brak miejsca), cała operacja jest wycofywana - nowy przedmiot
-        /// wraca do ekwipunku, stary pozostaje założony - i metoda zwraca false.
-        /// </summary>
         public bool TryEquip(ItemData item)
         {
             if (item == null)
@@ -53,7 +51,8 @@ namespace Project.Gameplay.Equipment
                 return false;
             }
 
-            if (item.ItemType != ItemType.Weapon && item.ItemType != ItemType.Armor && item.ItemType != ItemType.Jewelry)
+            EquipmentSlot? targetSlot = ResolveTargetSlot(item);
+            if (targetSlot == null)
             {
                 return false;
             }
@@ -63,7 +62,7 @@ namespace Project.Gameplay.Equipment
                 return false;
             }
 
-            ItemData previousItem = GetEquippedItem(item.ItemType);
+            ItemData previousItem = GetEquippedItem(targetSlot.Value);
             if (previousItem != null && !_inventorySystem.TryAddItem(previousItem, 1))
             {
                 // Rollback: nie ma miejsca na stary przedmiot - nie zdejmuj nowego z ekwipunku.
@@ -71,18 +70,14 @@ namespace Project.Gameplay.Equipment
                 return false;
             }
 
-            SetEquippedItem(item.ItemType, item);
+            SetEquippedItem(targetSlot.Value, item);
             EventBus.Publish(new EquipmentChangedEvent());
             return true;
         }
 
-        /// <summary>
-        /// Próbuje zdjąć przedmiot z danego slotu i zwrócić go do ekwipunku. Jeśli ekwipunek jest
-        /// pełny, slot pozostaje założony i metoda zwraca false - gracz musi najpierw zrobić miejsce.
-        /// </summary>
-        public bool TryUnequip(ItemType slotType)
+        public bool TryUnequip(EquipmentSlot slot)
         {
-            ItemData equippedItem = GetEquippedItem(slotType);
+            ItemData equippedItem = GetEquippedItem(slot);
             if (equippedItem == null)
             {
                 return false;
@@ -93,38 +88,83 @@ namespace Project.Gameplay.Equipment
                 return false;
             }
 
-            SetEquippedItem(slotType, null);
+            SetEquippedItem(slot, null);
             EventBus.Publish(new EquipmentChangedEvent());
             return true;
         }
 
-        private ItemData GetEquippedItem(ItemType slotType)
+        private EquipmentSlot? ResolveTargetSlot(ItemData item)
         {
-            switch (slotType)
+            switch (item.ItemType)
             {
                 case ItemType.Weapon:
-                    return EquippedWeapon;
+                    return EquipmentSlot.Weapon;
                 case ItemType.Armor:
-                    return EquippedArmor;
+                    return EquipmentSlot.Armor;
                 case ItemType.Jewelry:
-                    return EquippedJewelry;
+                    return ResolveJewelrySlot(item);
                 default:
                     return null;
             }
         }
 
-        private void SetEquippedItem(ItemType slotType, ItemData item)
+        private EquipmentSlot ResolveJewelrySlot(ItemData item)
         {
-            switch (slotType)
+            if (item.JewelryType == JewelryType.Necklace)
             {
-                case ItemType.Weapon:
+                return EquipmentSlot.Necklace;
+            }
+
+            if (EquippedRing1 == null)
+            {
+                return EquipmentSlot.Ring1;
+            }
+
+            if (EquippedRing2 == null)
+            {
+                return EquipmentSlot.Ring2;
+            }
+
+            return EquipmentSlot.Ring1;
+        }
+
+        private ItemData GetEquippedItem(EquipmentSlot slot)
+        {
+            switch (slot)
+            {
+                case EquipmentSlot.Weapon:
+                    return EquippedWeapon;
+                case EquipmentSlot.Armor:
+                    return EquippedArmor;
+                case EquipmentSlot.Ring1:
+                    return EquippedRing1;
+                case EquipmentSlot.Ring2:
+                    return EquippedRing2;
+                case EquipmentSlot.Necklace:
+                    return EquippedNecklace;
+                default:
+                    return null;
+            }
+        }
+
+        private void SetEquippedItem(EquipmentSlot slot, ItemData item)
+        {
+            switch (slot)
+            {
+                case EquipmentSlot.Weapon:
                     EquippedWeapon = item;
                     break;
-                case ItemType.Armor:
+                case EquipmentSlot.Armor:
                     EquippedArmor = item;
                     break;
-                case ItemType.Jewelry:
-                    EquippedJewelry = item;
+                case EquipmentSlot.Ring1:
+                    EquippedRing1 = item;
+                    break;
+                case EquipmentSlot.Ring2:
+                    EquippedRing2 = item;
+                    break;
+                case EquipmentSlot.Necklace:
+                    EquippedNecklace = item;
                     break;
             }
         }

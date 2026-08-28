@@ -13,6 +13,7 @@ namespace Project.Data
         [SerializeField] private int goldAmount = 0;
         [SerializeField] private ItemData rewardItem;
         [SerializeField] private int rewardItemQuantity = 1;
+        [SerializeField] private int xpAmount = 0;
 
         public int GoldAmount => goldAmount;
 
@@ -21,5 +22,7 @@ namespace Project.Data
 
         /// <summary>Ignorowane, jeśli RewardItem == null.</summary>
         public int RewardItemQuantity => rewardItemQuantity;
+
+        public int XpAmount => xpAmount;
     }
 }

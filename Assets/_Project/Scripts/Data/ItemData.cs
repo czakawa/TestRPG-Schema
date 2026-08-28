@@ -22,6 +22,12 @@ namespace Project.Data
         Quest = 3
     }
 
+    public enum JewelryType
+    {
+        Ring,
+        Necklace
+    }
+
     /// <summary>
     /// Statyczna definicja przedmiotu w grze. Instancje tworzone jako assety przez
     /// menu Gothic/Item, referencjonowane z Inventory/Interaction, nigdy nie modyfikowane
@@ -38,7 +44,9 @@ namespace Project.Data
         [SerializeField] private bool isStackable;
         [SerializeField] private int maxStackSize = 1;
         [SerializeField] private ItemType itemType;
+        [SerializeField] private JewelryType jewelryType;
         [SerializeField] private float damageValue;
+        [SerializeField] private float weaponRange = 2f;
         [SerializeField] private float armorValue;
         [SerializeField] private int basePrice;
         [SerializeField] private GameObject weaponPrefab;
@@ -59,10 +67,19 @@ namespace Project.Data
 
         public ItemType ItemType => itemType;
 
+        /// <summary>Sensowne tylko dla ItemType.Jewelry - rozróżnia Pierścień (trafia do Ring1/Ring2)
+        /// od Naszyjnika (trafia zawsze do Necklace). Ignorowane dla innych typów.</summary>
+        public JewelryType JewelryType => jewelryType;
+
         /// <summary>Sensowne tylko dla ItemType.Weapon, ignorowane dla innych typów - CombatBridge
         /// odczytuje tę wartość dla EquippedWeapon niezależnie od ItemType, więc pole celowo nie ma
         /// walidacji/enforce w edytorze na tym etapie.</summary>
         public float DamageValue => damageValue;
+
+        /// <summary>Sensowne tylko dla ItemType.Weapon - fizyczny zasięg ataku tą bronią (np. krótki
+        /// sztylet vs długi miecz dwuręczny). Ignorowane dla innych typów, bez walidacji/enforce
+        /// w edytorze - tak samo luźne jak DamageValue/ArmorValue.</summary>
+        public float WeaponRange => weaponRange;
 
         /// <summary>Sensowne tylko dla ItemType.Armor, ignorowane dla innych typów - tak samo luźne
         /// jak DamageValue, bez walidacji/enforce w edytorze.</summary>

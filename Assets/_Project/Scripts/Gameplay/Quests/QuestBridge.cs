@@ -4,6 +4,7 @@ using Project.Core.Events;
 using Project.Data;
 using Project.Gameplay.Economy;
 using Project.Gameplay.Inventory;
+using Project.Gameplay.Stats;
 using UnityEngine;
 
 namespace Project.Gameplay.Quests
@@ -34,6 +35,7 @@ namespace Project.Gameplay.Quests
     {
         [SerializeField] private InventoryBridge inventoryBridge;
         [SerializeField] private CurrencyBridge currencyBridge;
+        [SerializeField] private PlayerStatsBridge playerStatsBridge;
 
         private QuestSystem _questSystem;
 
@@ -54,7 +56,7 @@ namespace Project.Gameplay.Quests
                 return;
             }
 
-            _questSystem = new QuestSystem(inventoryBridge.Inventory, currencyBridge.Currency);
+            _questSystem = new QuestSystem(inventoryBridge.Inventory, currencyBridge.Currency, playerStatsBridge.Stats);
             GameManager.Instance.Systems.RegisterSystem(_questSystem);
 
             EventBus.Subscribe<InventoryChangedEvent>(OnInventoryChanged);

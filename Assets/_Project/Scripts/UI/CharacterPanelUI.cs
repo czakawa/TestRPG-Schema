@@ -1,8 +1,6 @@
 using Project.Core;
 using Project.Core.Events;
 using Project.Core.States;
-using Project.Data;
-using Project.Gameplay.Equipment;
 using Project.Gameplay.Stats;
 using TMPro;
 using UnityEngine;
@@ -11,9 +9,10 @@ using UnityEngine.InputSystem;
 namespace Project.UI
 {
     /// <summary>
-    /// Panel postaci - podgląd statystyk (Vitale + atrybuty) i trzech slotów ekwipunku zakładanego.
-    /// Przełączany akcją ToggleCharacterPanel (klawisz C), odświeżany po StatsChangedEvent
-    /// i EquipmentChangedEvent oraz przy otwarciu, dokładnie jak InventoryUIController.
+    /// Panel postaci - podgląd statystyk (Vitale + atrybuty + XP/Poziom/Punkty Nauki). Przełączany
+    /// akcją ToggleCharacterPanel (klawisz C), odświeżany po StatsChangedEvent oraz przy otwarciu,
+    /// dokładnie jak InventoryUIController. Sloty założonego ekwipunku (broń/zbroja/biżuteria) żyją
+    /// w InventoryUIController, nie tutaj.
     ///
     /// Blokuje ruch/kamerę własnym kluczem "CharacterPanel" w GameplayInputLock, niezależnym od
     /// klucza "Inventory" - panel postaci i panel ekwipunku (Tab) mogą być otwarte jednocześnie
@@ -26,7 +25,6 @@ namespace Project.UI
         private const string CharacterPanelLockReason = "CharacterPanel";
 
         [SerializeField] private PlayerStatsBridge playerStatsBridge;
-        [SerializeField] private EquipmentBridge equipmentBridge;
 
         [SerializeField] private GameObject characterPanelRoot;
         [SerializeField] private InputActionReference toggleCharacterPanelAction;
@@ -39,10 +37,9 @@ namespace Project.UI
         [SerializeField] private TextMeshProUGUI dexterityText;
         [SerializeField] private TextMeshProUGUI enduranceText;
         [SerializeField] private TextMeshProUGUI wisdomText;
-
-        [SerializeField] private EquipmentSlotUI weaponSlot;
-        [SerializeField] private EquipmentSlotUI armorSlot;
-        [SerializeField] private EquipmentSlotUI jewelrySlot;
+        [SerializeField] private TextMeshProUGUI levelText;
+        [SerializeField] private TextMeshProUGUI experienceText;
+        [SerializeField] private TextMeshProUGUI learningPointsText;
 
         private void Awake()
         {
@@ -52,29 +49,19 @@ namespace Project.UI
         private void OnEnable()
         {
             EventBus.Subscribe<StatsChangedEvent>(OnStatsChanged);
-            EventBus.Subscribe<EquipmentChangedEvent>(OnEquipmentChanged);
             EventBus.Subscribe<DialogueStartedEvent>(OnDialogueStarted);
 
             toggleCharacterPanelAction.action.Enable();
             toggleCharacterPanelAction.action.performed += OnTogglePerformed;
-
-            weaponSlot.OnSlotClicked += OnWeaponSlotClicked;
-            armorSlot.OnSlotClicked += OnArmorSlotClicked;
-            jewelrySlot.OnSlotClicked += OnJewelrySlotClicked;
         }
 
         private void OnDisable()
         {
             EventBus.Unsubscribe<StatsChangedEvent>(OnStatsChanged);
-            EventBus.Unsubscribe<EquipmentChangedEvent>(OnEquipmentChanged);
             EventBus.Unsubscribe<DialogueStartedEvent>(OnDialogueStarted);
 
             toggleCharacterPanelAction.action.performed -= OnTogglePerformed;
             toggleCharacterPanelAction.action.Disable();
-
-            weaponSlot.OnSlotClicked -= OnWeaponSlotClicked;
-            armorSlot.OnSlotClicked -= OnArmorSlotClicked;
-            jewelrySlot.OnSlotClicked -= OnJewelrySlotClicked;
 
             if (characterPanelRoot.activeSelf)
             {
@@ -88,14 +75,6 @@ namespace Project.UI
             if (characterPanelRoot.activeSelf)
             {
                 RefreshStats();
-            }
-        }
-
-        private void OnEquipmentChanged(EquipmentChangedEvent evt)
-        {
-            if (characterPanelRoot.activeSelf)
-            {
-                RefreshEquipment();
             }
         }
 
@@ -130,7 +109,6 @@ namespace Project.UI
             GameplayInputLock.LockMovement(CharacterPanelLockReason);
             GameplayInputLock.LockCamera(CharacterPanelLockReason);
             RefreshStats();
-            RefreshEquipment();
         }
 
         private void ClosePanel()
@@ -138,21 +116,6 @@ namespace Project.UI
             characterPanelRoot.SetActive(false);
             GameplayInputLock.UnlockMovement(CharacterPanelLockReason);
             GameplayInputLock.UnlockCamera(CharacterPanelLockReason);
-        }
-
-        private void OnWeaponSlotClicked()
-        {
-            equipmentBridge.Equipment.TryUnequip(ItemType.Weapon);
-        }
-
-        private void OnArmorSlotClicked()
-        {
-            equipmentBridge.Equipment.TryUnequip(ItemType.Armor);
-        }
-
-        private void OnJewelrySlotClicked()
-        {
-            equipmentBridge.Equipment.TryUnequip(ItemType.Jewelry);
         }
 
         private void RefreshStats()
@@ -167,15 +130,9 @@ namespace Project.UI
             dexterityText.text = $"Zręczność: {stats.Dexterity}";
             enduranceText.text = $"Wytrzymałość: {stats.Endurance}";
             wisdomText.text = $"Mądrość: {stats.Wisdom}";
-        }
-
-        private void RefreshEquipment()
-        {
-            EquipmentSystem equipment = equipmentBridge.Equipment;
-
-            weaponSlot.SetItem(equipment.EquippedWeapon);
-            armorSlot.SetItem(equipment.EquippedArmor);
-            jewelrySlot.SetItem(equipment.EquippedJewelry);
+            levelText.text = $"Poziom: {stats.Level}";
+            experienceText.text = $"Doświadczenie: {stats.Experience}/{stats.XpRequiredForNextLevel}";
+            learningPointsText.text = $"Punkty Nauki: {stats.LearningPoints}";
         }
     }
 }

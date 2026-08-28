@@ -14,6 +14,7 @@ namespace Project.Gameplay.Combat
     {
         [SerializeField] private float maxHealth = 50f;
         [SerializeField] private float deathDestroyDelay = 2.5f;
+        [SerializeField] private int xpReward = 10;
 
         private float _currentHealth;
         private EnemyAnimatorBridge _animatorBridge;
@@ -25,6 +26,8 @@ namespace Project.Gameplay.Combat
 
         /// <summary>Do odczytu przez EnemyHealthBarUI - maksymalne HP wroga.</summary>
         public float MaxHealth => maxHealth;
+
+        public int XpReward => xpReward;
 
         private void Awake()
         {

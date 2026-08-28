@@ -1,4 +1,5 @@
 using System;
+using Project.Gameplay.Stats;
 using UnityEngine;
 
 namespace Project.Data
@@ -27,6 +28,8 @@ namespace Project.Data
         [SerializeField] private QuestActionType questAction = QuestActionType.None;
         [SerializeField] private QuestData targetQuest;
         [SerializeField] private bool opensTrade;
+        [SerializeField] private bool triggersTraining;
+        [SerializeField] private AttributeType trainingAttribute;
 
         public string OptionText => optionText;
 
@@ -43,5 +46,11 @@ namespace Project.Data
         /// Niezależne od QuestAction/NextNodeIndex - może współistnieć z akcją questową na tej samej
         /// opcji, i typowo kończy rozmowę (NextNodeIndex == -1) w tym samym wyborze.</summary>
         public bool OpensTrade => opensTrade;
+
+        /// <summary>Czy wybranie tej opcji publikuje TrainingRequestedEvent - natychmiastowa transakcja
+        /// nauki, bez osobnego UI, analogicznie do OpensTrade ale bez panelu.</summary>
+        public bool TriggersTraining => triggersTraining;
+        /// <summary>Atrybut do wytrenowania. Ignorowane, jeśli TriggersTraining == false.</summary>
+        public AttributeType TrainingAttribute => trainingAttribute;
     }
 }

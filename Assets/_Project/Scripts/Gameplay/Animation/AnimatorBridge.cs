@@ -30,6 +30,7 @@ namespace Project.Gameplay.Animation
         {
             EventBus.Subscribe<PlayerAttackPerformedEvent>(OnPlayerAttackPerformed);
             EventBus.Subscribe<PlayerDiedEvent>(OnPlayerDied);
+            EventBus.Subscribe<WeaponDrawStateChangedEvent>(OnWeaponDrawStateChanged);
 
             if (GameManager.Instance == null)
             {
@@ -44,6 +45,7 @@ namespace Project.Gameplay.Animation
         {
             EventBus.Unsubscribe<PlayerAttackPerformedEvent>(OnPlayerAttackPerformed);
             EventBus.Unsubscribe<PlayerDiedEvent>(OnPlayerDied);
+            EventBus.Unsubscribe<WeaponDrawStateChangedEvent>(OnWeaponDrawStateChanged);
 
             if (GameManager.Instance != null)
             {
@@ -64,6 +66,20 @@ namespace Project.Gameplay.Animation
         private void OnPlayerDied(PlayerDiedEvent evt)
         {
             _animatorSystem.TriggerDeath();
+        }
+
+        private void OnWeaponDrawStateChanged(WeaponDrawStateChangedEvent evt)
+        {
+            _animatorSystem.SetArmed(evt.IsDrawn);
+
+            if (evt.IsDrawn)
+            {
+                _animatorSystem.TriggerDraw();
+            }
+            else
+            {
+                _animatorSystem.TriggerSheathe();
+            }
         }
     }
 }

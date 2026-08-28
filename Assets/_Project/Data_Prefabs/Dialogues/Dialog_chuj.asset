@@ -22,11 +22,22 @@ MonoBehaviour:
       questAction: 1
       targetQuest: {fileID: 11400000, guid: 2a3f81a44eb668f4986ea5a2a11a54e9, type: 2}
       opensTrade: 0
+      triggersTraining: 0
+      trainingAttribute: 0
     - optionText: Jebany Kokot do pici
       nextNodeIndex: -1
       questAction: 0
       targetQuest: {fileID: 0}
       opensTrade: 0
+      triggersTraining: 0
+      trainingAttribute: 0
+    - optionText: "Naucz Mnie Si\u0142y"
+      nextNodeIndex: 0
+      questAction: 0
+      targetQuest: {fileID: 0}
+      opensTrade: 0
+      triggersTraining: 1
+      trainingAttribute: 0
   - npcText: Masz Picie kurla
     speakerName: Cwel
     options:
@@ -35,9 +46,13 @@ MonoBehaviour:
       questAction: 2
       targetQuest: {fileID: 11400000, guid: 2a3f81a44eb668f4986ea5a2a11a54e9, type: 2}
       opensTrade: 0
+      triggersTraining: 0
+      trainingAttribute: 0
     - optionText: Nie chcem
       nextNodeIndex: -1
       questAction: 0
       targetQuest: {fileID: 0}
       opensTrade: 0
+      triggersTraining: 0
+      trainingAttribute: 0
   startNodeIndex: 0

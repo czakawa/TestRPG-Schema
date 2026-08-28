@@ -86,6 +86,11 @@ namespace Project.Gameplay.Dialogue
                 EventBus.Publish(new TradeRequestedEvent());
             }
 
+            if (option.TriggersTraining)
+            {
+                EventBus.Publish(new TrainingRequestedEvent(option.TrainingAttribute));
+            }
+
             if (option.NextNodeIndex == -1)
             {
                 EndDialogue();

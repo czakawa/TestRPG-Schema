@@ -72,6 +72,9 @@ namespace Project.Gameplay.Stats
         private readonly int _startingWisdom;
         private readonly float _staminaRegenRate;
         private readonly float _staminaRegenDelay;
+        private readonly int _xpPerLevelBase;
+        private readonly int _xpPerLevelIncrease;
+        private readonly int _learningPointsPerLevel;
 
         private int _strength;
         private int _dexterity;
@@ -79,6 +82,9 @@ namespace Project.Gameplay.Stats
         private int _wisdom;
         private bool _isDead;
         private float _timeSinceStaminaUse;
+        private int _experience;
+        private int _level;
+        private int _learningPoints;
 
         // Reszta ułamkowa nieodzwierciedlona jeszcze w Stamina.Current (int), zawsze w [0, 1).
         // Konieczna, bo koszt sprintu/regeneracja liczone są per-klatkę (np. 15 * Time.deltaTime =~
@@ -94,6 +100,11 @@ namespace Project.Gameplay.Stats
         public int Dexterity => _dexterity;
         public int Endurance => _endurance;
         public int Wisdom => _wisdom;
+        public bool IsDead => _isDead;
+
+        public int Experience => _experience;
+        public int Level => _level;
+        public int LearningPoints => _learningPoints;
 
         public PlayerStatsSystem(
             int startingHealth = 100,
@@ -104,7 +115,10 @@ namespace Project.Gameplay.Stats
             int startingEndurance = 10,
             int startingWisdom = 10,
             float staminaRegenRate = 10f,
-            float staminaRegenDelay = 2f)
+            float staminaRegenDelay = 2f,
+            int xpPerLevelBase = 100,
+            int xpPerLevelIncrease = 50,
+            int learningPointsPerLevel = 5)
         {
             _startingHealth = startingHealth;
             _startingStamina = startingStamina;
@@ -115,6 +129,9 @@ namespace Project.Gameplay.Stats
             _startingWisdom = startingWisdom;
             _staminaRegenRate = staminaRegenRate;
             _staminaRegenDelay = staminaRegenDelay;
+            _xpPerLevelBase = xpPerLevelBase;
+            _xpPerLevelIncrease = xpPerLevelIncrease;
+            _learningPointsPerLevel = learningPointsPerLevel;
         }
 
         public void Initialize()
@@ -130,6 +147,9 @@ namespace Project.Gameplay.Stats
             _isDead = false;
             _timeSinceStaminaUse = 0f;
             _staminaFraction = 0f;
+            _experience = 0;
+            _level = 1;
+            _learningPoints = 0;
         }
 
         public void Tick(float deltaTime)
@@ -225,6 +245,65 @@ namespace Project.Gameplay.Stats
         {
             Mana.Add(delta);
             EventBus.Publish(new StatsChangedEvent());
+        }
+
+        public void AddExperience(int amount)
+        {
+            if (amount <= 0)
+            {
+                return;
+            }
+
+            _experience += amount;
+
+            while (_experience >= GetXpRequiredForNextLevel())
+            {
+                _experience -= GetXpRequiredForNextLevel();
+                _level++;
+                _learningPoints += _learningPointsPerLevel;
+                EventBus.Publish(new LevelUpEvent(_level));
+            }
+
+            EventBus.Publish(new StatsChangedEvent());
+        }
+
+        public int XpRequiredForNextLevel => GetXpRequiredForNextLevel();
+
+        private int GetXpRequiredForNextLevel()
+        {
+            return _xpPerLevelBase + (_level - 1) * _xpPerLevelIncrease;
+        }
+
+        /// <summary>Analogiczne do TrySpendStamina - zwraca false bez efektu ubocznego, jeśli brakuje LP.</summary>
+        public bool TrySpendLearningPoints(int amount)
+        {
+            if (_learningPoints < amount)
+            {
+                return false;
+            }
+
+            _learningPoints -= amount;
+            EventBus.Publish(new StatsChangedEvent());
+            return true;
+        }
+
+        /// <summary>Odczyt dowolnego atrybutu po typie - do użytku przez NpcTrainer (sprawdzenie limitu
+        /// nauczyciela i wyliczenie nowej wartości po treningu).</summary>
+        public int GetAttribute(AttributeType type)
+        {
+            switch (type)
+            {
+                case AttributeType.Strength:
+                    return _strength;
+                case AttributeType.Dexterity:
+                    return _dexterity;
+                case AttributeType.Endurance:
+                    return _endurance;
+                case AttributeType.Wisdom:
+                    return _wisdom;
+                default:
+                    return 0;
+            }
         }
 
         /// <summary>

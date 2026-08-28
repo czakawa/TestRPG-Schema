@@ -16,13 +16,11 @@ namespace Project.Gameplay.Combat
     {
         private const float AttackRadius = 0.5f;
 
-        private readonly float _attackRange;
         private readonly LayerMask _enemyLayer;
         private readonly RaycastHit[] _hitBuffer = new RaycastHit[1];
 
-        public CombatSystem(float attackRange, LayerMask enemyLayer)
+        public CombatSystem(LayerMask enemyLayer)
         {
-            _attackRange = attackRange;
             _enemyLayer = enemyLayer;
         }
 
@@ -50,14 +48,14 @@ namespace Project.Gameplay.Combat
         /// obrażenia i publikuje EnemyDamagedEvent; brak trafienia lub trafienie w obiekt bez
         /// IDamageable/już martwy nic nie robi.
         /// </summary>
-        public void PerformAttack(Vector3 origin, Vector3 direction, float damage)
+        public void PerformAttack(Vector3 origin, Vector3 direction, float damage, float range)
         {
             int hitCount = Physics.SphereCastNonAlloc(
                 origin,
                 AttackRadius,
                 direction,
                 _hitBuffer,
-                _attackRange,
+                range,
                 _enemyLayer,
                 QueryTriggerInteraction.Ignore);
 

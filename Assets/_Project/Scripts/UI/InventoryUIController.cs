@@ -33,6 +33,11 @@ namespace Project.UI
         [SerializeField] private InputActionReference toggleInventoryAction;
         [SerializeField] private InventoryCategoryTabs categoryTabs;
         [SerializeField] private ItemDescriptionPanel descriptionPanel;
+        [SerializeField] private EquipmentSlotUI weaponSlot;
+        [SerializeField] private EquipmentSlotUI armorSlot;
+        [SerializeField] private EquipmentSlotUI ring1Slot;
+        [SerializeField] private EquipmentSlotUI ring2Slot;
+        [SerializeField] private EquipmentSlotUI necklaceSlot;
 
         private ItemType? _activeFilter;
 
@@ -45,24 +50,38 @@ namespace Project.UI
         {
             EventBus.Subscribe<InventoryChangedEvent>(OnInventoryChanged);
             EventBus.Subscribe<DialogueStartedEvent>(OnDialogueStarted);
+            EventBus.Subscribe<EquipmentChangedEvent>(OnEquipmentChanged);
 
             toggleInventoryAction.action.Enable();
             toggleInventoryAction.action.performed += OnTogglePerformed;
 
             categoryTabs.OnCategorySelected += OnCategorySelected;
             descriptionPanel.OnEquipClicked += OnEquipClicked;
+
+            weaponSlot.OnSlotClicked += OnWeaponSlotClicked;
+            armorSlot.OnSlotClicked += OnArmorSlotClicked;
+            ring1Slot.OnSlotClicked += OnRing1SlotClicked;
+            ring2Slot.OnSlotClicked += OnRing2SlotClicked;
+            necklaceSlot.OnSlotClicked += OnNecklaceSlotClicked;
         }
 
         private void OnDisable()
         {
             EventBus.Unsubscribe<InventoryChangedEvent>(OnInventoryChanged);
             EventBus.Unsubscribe<DialogueStartedEvent>(OnDialogueStarted);
+            EventBus.Unsubscribe<EquipmentChangedEvent>(OnEquipmentChanged);
 
             toggleInventoryAction.action.performed -= OnTogglePerformed;
             toggleInventoryAction.action.Disable();
 
             categoryTabs.OnCategorySelected -= OnCategorySelected;
             descriptionPanel.OnEquipClicked -= OnEquipClicked;
+
+            weaponSlot.OnSlotClicked -= OnWeaponSlotClicked;
+            armorSlot.OnSlotClicked -= OnArmorSlotClicked;
+            ring1Slot.OnSlotClicked -= OnRing1SlotClicked;
+            ring2Slot.OnSlotClicked -= OnRing2SlotClicked;
+            necklaceSlot.OnSlotClicked -= OnNecklaceSlotClicked;
 
             if (inventoryPanelRoot.activeSelf)
             {
@@ -76,6 +95,14 @@ namespace Project.UI
             if (inventoryPanelRoot.activeSelf)
             {
                 RefreshSlots();
+            }
+        }
+
+        private void OnEquipmentChanged(EquipmentChangedEvent evt)
+        {
+            if (inventoryPanelRoot.activeSelf)
+            {
+                RefreshEquipment();
             }
         }
 
@@ -110,6 +137,7 @@ namespace Project.UI
             GameplayInputLock.LockMovement(InventoryLockReason);
             GameplayInputLock.LockCamera(InventoryLockReason);
             RefreshSlots();
+            RefreshEquipment();
         }
 
         private void ClosePanel()
@@ -144,6 +172,42 @@ namespace Project.UI
             {
                 descriptionPanel.Hide();
             }
+        }
+
+        private void OnWeaponSlotClicked()
+        {
+            equipmentBridge.Equipment.TryUnequip(EquipmentSlot.Weapon);
+        }
+
+        private void OnArmorSlotClicked()
+        {
+            equipmentBridge.Equipment.TryUnequip(EquipmentSlot.Armor);
+        }
+
+        private void OnRing1SlotClicked()
+        {
+            equipmentBridge.Equipment.TryUnequip(EquipmentSlot.Ring1);
+        }
+
+        private void OnRing2SlotClicked()
+        {
+            equipmentBridge.Equipment.TryUnequip(EquipmentSlot.Ring2);
+        }
+
+        private void OnNecklaceSlotClicked()
+        {
+            equipmentBridge.Equipment.TryUnequip(EquipmentSlot.Necklace);
+        }
+
+        private void RefreshEquipment()
+        {
+            EquipmentSystem equipment = equipmentBridge.Equipment;
+
+            weaponSlot.SetItem(equipment.EquippedWeapon);
+            armorSlot.SetItem(equipment.EquippedArmor);
+            ring1Slot.SetItem(equipment.EquippedRing1);
+            ring2Slot.SetItem(equipment.EquippedRing2);
+            necklaceSlot.SetItem(equipment.EquippedNecklace);
         }
 
         private void RefreshSlots()

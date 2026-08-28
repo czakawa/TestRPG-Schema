@@ -20,6 +20,7 @@ MonoBehaviour:
   maxStackSize: 1
   itemType: 0
   damageValue: 15
+  weaponRange: 3.2
   armorValue: 0
   basePrice: 30
   weaponPrefab: {fileID: 21582755038796499, guid: 7c3c970bd5b747e458f38552c2e58630, type: 3}

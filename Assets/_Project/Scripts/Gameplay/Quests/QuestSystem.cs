@@ -4,6 +4,7 @@ using Project.Core.Systems;
 using Project.Data;
 using Project.Gameplay.Economy;
 using Project.Gameplay.Inventory;
+using Project.Gameplay.Stats;
 using UnityEngine;
 
 namespace Project.Gameplay.Quests
@@ -19,15 +20,17 @@ namespace Project.Gameplay.Quests
     {
         private readonly InventorySystem _inventorySystem;
         private readonly CurrencySystem _currencySystem;
+        private readonly PlayerStatsSystem _playerStatsSystem;
         private readonly Dictionary<string, QuestProgress> _activeQuests = new Dictionary<string, QuestProgress>();
 
         /// <summary>Wszystkie questy, które gracz kiedykolwiek rozpoczął (dowolny stan poza NotStarted) - do UI quest logu.</summary>
         public IReadOnlyDictionary<string, QuestProgress> ActiveQuests => _activeQuests;
 
-        public QuestSystem(InventorySystem inventorySystem, CurrencySystem currencySystem)
+        public QuestSystem(InventorySystem inventorySystem, CurrencySystem currencySystem, PlayerStatsSystem playerStatsSystem)
         {
             _inventorySystem = inventorySystem;
             _currencySystem = currencySystem;
+            _playerStatsSystem = playerStatsSystem;
         }
 
         public void Initialize()
@@ -149,6 +152,11 @@ namespace Project.Gameplay.Quests
             if (reward.GoldAmount > 0)
             {
                 _currencySystem.AddGold(reward.GoldAmount);
+            }
+
+            if (reward.XpAmount > 0)
+            {
+                _playerStatsSystem.AddExperience(reward.XpAmount);
             }
 
             progress.State = QuestState.TurnedIn;
